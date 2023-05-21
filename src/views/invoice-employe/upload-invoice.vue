@@ -359,8 +359,7 @@ export default {
       const codigoTecla = event.keyCode || event.which
       console.log('codTecle: ' + codigoTecla)
       // Permite solo números (códigos de teclas del 0 al 9)
-      if ((codigoTecla >= 48 && codigoTecla <= 57) || (codigoTecla >= 96 && codigoTecla <= 105) || (codigoTecla === 8)
-        || (codigoTecla === 9) || (codigoTecla === 110) || (codigoTecla === 190)) {
+      if ((codigoTecla >= 48 && codigoTecla <= 57) || (codigoTecla >= 96 && codigoTecla <= 105) || (codigoTecla === 8) || (codigoTecla === 9) || (codigoTecla === 110) || (codigoTecla === 190)) {
         return true
       } else {
         event.preventDefault()
