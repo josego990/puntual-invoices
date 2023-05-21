@@ -145,6 +145,15 @@ export default {
         body).then((response) => {
         // console.log(response.data)
         this.list = response.data
+
+        for (let i = 0; i < this.list.length; i++) {
+          this.list[i].sample_desc_invoice = 'https://puntual-imagenes.s3.amazonaws.com/' + this.list[i].sample_desc_invoice
+          this.list[i].formula_column = '=HIPERVINCULO(G2)'
+          // console.log(this.list[i].sample_desc_invoice)
+        }
+
+        console.log(this.list)
+
         this.listLoading = false
       })
     },
@@ -161,11 +170,15 @@ export default {
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
+        for (let i = 0; i < this.list.length; i++) {
+          this.list[i].sample_desc_invoice = 'https://puntual-imagenes.s3.amazonaws.com/' + this.list[i].sample_desc_invoice
+          // console.log(this.list[i].sample_desc_invoice)
+        }
         this.listLoading = false
       })
     },
     handleView(sample) {
-      window.open('https://puntual-imagenes.s3.amazonaws.com/' + sample, '_blank')
+      window.open(sample, '_blank')
     },
     formatFecha(fecha) {
       return moment(fecha).format('DD/MM/YYYY')
@@ -179,9 +192,10 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['ID_FACTURA', 'NOMBRE_EMPLEADO', 'SERIE', 'NUMERO', 'FECHA_FACTURA', 'MONTO']
-        const filterVal = ['id_recep_invoice', 'name_employe', 'serie_number_invoice', 'number_invoice', 'date_invoice', 'amount_invoice']
+        const tHeader = ['ID_FACTURA', 'NOMBRE_EMPLEADO', 'SERIE', 'NUMERO', 'FECHA_FACTURA', 'MONTO', 'NOMBRE_IMAGEN', 'VICULO_IMAGEN']
+        const filterVal = ['id_recep_invoice', 'name_employe', 'serie_number_invoice', 'number_invoice', 'date_invoice', 'amount_invoice', 'sample_desc_invoice', 'formula_column']
         const data = this.formatJson(filterVal)
+
         excel.export_json_to_excel({
           header: tHeader,
           data,
@@ -192,8 +206,11 @@ export default {
     },
     formatJson(filterVal) {
       return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
+        if (j === 'date_invoice') {
+          const dat = v[j].split('T')[0]
+          const spl = dat.split('-')
+          const newval = spl[2] + '-' + spl[1] + '-' + spl[0]
+          return newval
         } else {
           return v[j]
         }

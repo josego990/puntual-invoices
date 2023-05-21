@@ -335,7 +335,10 @@ export default {
       }
     },
     formatFecha(fecha) {
-      return moment(fecha).format('DD/MM/YYYY')
+      // return moment(fecha).format('DD/MM/YYYY')
+      const dat = fecha.split('T')[0]
+      const spl = dat.split('-')
+      return spl[2] + '-' + spl[1] + '-' + spl[0]
     },
     formatDecimal(monto) {
       var decimal = monto.toFixed(2)

@@ -592,11 +592,11 @@ export default {
       })
     },
     createEmploye() {
-      this.createLoading = true
       const personaString = JSON.stringify(this.temp_ins)
-      this.listLoading = true
       this.$refs['dataEmpForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
+          this.createLoading = true
           axios.post('http://23.23.76.112:3030/create-employe',
             personaString).then((response) => {
             console.log(response.data[0])

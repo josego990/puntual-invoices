@@ -86,8 +86,8 @@ export default {
       createLoading: false,
       name_filter: '',
       ins_rules: {
-        name_position: [{ required: true, message: 'NIT es requerido', trigger: 'blur' }],
-        desc_position: [{ required: true, message: 'Cuenta es requerida', trigger: 'blur' }]
+        name_position: [{ required: true, message: 'Puesto es requerido', trigger: 'blur' }],
+        desc_position: [{ required: true, message: 'Descripción es requerido', trigger: 'blur' }]
       },
       temp_ins: {
         name_position: '',
@@ -147,11 +147,11 @@ export default {
       })
     },
     createPosition() {
-      this.createLoading = true
       const personaString = JSON.stringify(this.temp_ins)
-      this.listLoading = true
       this.$refs['dataEmpForm'].validate((valid) => {
         if (valid) {
+          this.createLoading = true
+          this.listLoading = true
           axios.post('http://23.23.76.112:3030/create-position',
             personaString).then((response) => {
             console.log(response.data[0])
