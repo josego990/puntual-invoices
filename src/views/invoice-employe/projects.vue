@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     getPositionList() {
-      axios.get('http://localhost:3030/get-projects',
+      axios.get('http://23.23.76.112:3030/get-projects',
         '').then((response) => {
         console.log(response.data)
         this.list = response.data
