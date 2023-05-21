@@ -157,7 +157,8 @@ export default {
 
             .then(() => {
               // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.$router.push({ path: this.redirect || '/', query: '/#/dashboard' })
+              // this.$router.push({ path: this.redirect || '/', query: '/#/dashboard' }) // al dashboard general
+              this.$router.push({ path: this.redirect || '/', query: '/#/employe-envoice/invoices-employes' }) // a facturación empleados
               this.loading = false
             })
             .catch(() => {
