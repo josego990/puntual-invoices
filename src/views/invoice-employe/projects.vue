@@ -48,7 +48,7 @@ export default {
     }
   },
   created() {
-    this.getProyectsList()
+    this.getProjectsList()
   },
   methods: {
     getProjectsList() {
