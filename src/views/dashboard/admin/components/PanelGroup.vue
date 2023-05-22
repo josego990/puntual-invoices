@@ -7,22 +7,22 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Visits
+            Colaboradores
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cards_info.employe_count" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('messages')">
         <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
+          <svg-icon icon-class="documentation" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            Facturas este mes
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cards_info.invoices_count" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -33,22 +33,22 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            Total montos este mes
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cards_info.total_amount_month" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
+          <svg-icon icon-class="user" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            Pendietes factura mes
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cards_info.employe_diference" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -57,14 +57,30 @@
 
 <script>
 import CountTo from 'vue-count-to'
+import axios from 'axios'
 
 export default {
   components: {
     CountTo
   },
+  data() {
+    return {
+      cards_info: null
+    }
+  },
+  created() {
+    this.getDashboardData()
+  },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
+    },
+    getDashboardData() {
+      axios.post('http://23.23.76.112:3030/get-dashboard-data',
+        '').then((response) => {
+        console.log(response.data)
+        this.cards_info = response.data
+      })
     }
   }
 }
@@ -124,7 +140,7 @@ export default {
     }
 
     .icon-shopping {
-      color: #34bfa3
+      color: #f4516c
     }
 
     .card-panel-icon-wrapper {

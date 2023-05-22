@@ -123,7 +123,6 @@
 <script>
 import axios from 'axios'
 import waves from '@/directive/waves' // waves directive
-import moment from 'moment'
 
 const accountTypeOptions = [
   { key: '1', display_name: 'Q' },

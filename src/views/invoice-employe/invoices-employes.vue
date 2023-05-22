@@ -72,7 +72,7 @@
 import axios from 'axios'
 import waves from '@/directive/waves' // waves directive
 import moment from 'moment'
-import { parseTime } from '@/utils'
+// import { parseTime } from '@/utils'
 
 const accountTypeOptions = [
   { key: '1', display_name: 'Q' },

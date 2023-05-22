@@ -48,10 +48,10 @@ export default {
     }
   },
   created() {
-    this.getPositionList()
+    this.getProyectsList()
   },
   methods: {
-    getPositionList() {
+    getProjectsList() {
       axios.get('http://23.23.76.112:3030/get-projects',
         '').then((response) => {
         console.log(response.data)

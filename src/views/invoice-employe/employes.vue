@@ -8,8 +8,8 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Agregar
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Exportar
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-upload" @click="handleDialogExcel">
+        Carga excel
       </el-button>
     </div>
 
@@ -61,6 +61,30 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog v-loading="excelLoading" title="Cargar Empleados Excel" :visible.sync="dialogExcelVisible">
+      <el-form :model="temp" label-position="left" label-width="70px">
+        <table style="width:100%">
+          <tr>
+            <td>
+              <div class="vx-col sm:w-1/2 w-full mb-2">
+                <label>Seleccionar archivo Excel</label>
+                <input id="file" ref="file" type="file" prop="sample_desc_invoice" style="margin-left:20px;width:300px" @change="handleFileUpload()">
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogExcelVisible = false">
+          Cerrar
+        </el-button>
+        <el-button type="primary" @click="uploadExcelEmployes()">
+          Cargar Archivo
+        </el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :model="temp" label-position="left" label-width="70px">
@@ -401,9 +425,11 @@ export default {
   },
   data() {
     return {
+      file: null,
       dialogFormVisible: false,
       dialogEditEmployeVisible: false,
       dialogCreateEmployeVisible: false,
+      dialogExcelVisible: false,
       statusOptions: ['published', 'draft', 'deleted'],
       accountTypeOptions: ['Monetaria', 'Ahorro'],
       dialogStatus: 'Datos de Empleado',
@@ -467,6 +493,8 @@ export default {
       positions_list: null,
       banks_list: null,
       listLoading: true,
+      excelLoading: false,
+      excelSelected: false,
       dialogLoading: false,
       createLoading: false,
       listQuery: {
@@ -568,13 +596,73 @@ export default {
       this.resetTempIns()
       this.dialogCreateEmployeVisible = true
     },
-    updateEmploye() {
-      this.dialogLoading = true
-      this.listLoading = true
-      const personaString = JSON.stringify(this.temp)
+    handleDialogExcel() {
+      this.dialogExcelVisible = true
+    },
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0]
+      const fileName = this.file.name
+      const fileExtension = fileName.split('.').pop()
+      if (fileExtension === 'xlsx') {
+        this.excelSelected = true
+      } else {
+        this.$message({
+          message: 'El archivo debe ser formato xlsx.',
+          type: 'error'
+        })
+        this.excelSelected = false
+      }
+      console.log(this.file.name)
+      this.temp_ins.sample_desc_invoice = this.file.name
+    },
+    uploadExcelEmployes() {
+      if (this.excelSelected) {
+        this.excelLoading = true
+        const formData = new FormData()
+        formData.append('file', this.file)
 
+        axios.post('http://23.23.76.112:3030/upload-employes-excel',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'i_c': '1',
+              'n_f': this.file.name,
+              'd_e': '01/01/2024'
+            }
+          }
+        ).then((response) => {
+          console.log(response.data)
+          if (response.data === 'success') {
+            this.$message({
+              message: 'Los cambios fueron guardados.',
+              type: 'success'
+            })
+            this.listLoading = true
+            this.getEmployesList()
+            this.dialogExcelVisible = false
+            this.excelLoading = false
+            this.excelSelected = false
+          }
+        }).catch((error) => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        })
+      } else {
+        this.$message({
+          message: 'No ha seleccionado un archivo Excel válido.',
+          type: 'error'
+        })
+      }
+    },
+    updateEmploye() {
+      const personaString = JSON.stringify(this.temp)
       this.$refs['dataEmpForm'].validate((valid) => {
         if (valid) {
+          this.dialogLoading = true
+          this.listLoading = true
           axios.post('http://23.23.76.112:3030/update-employe',
             personaString).then((response) => {
             console.log(response.data[0])
