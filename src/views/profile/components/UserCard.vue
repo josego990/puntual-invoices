@@ -6,44 +6,44 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
+        <pan-thumb :image="profilePicture" :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hello</div>
           {{ user.role }}
         </pan-thumb>
       </div>
       <div class="box-center">
-        <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.role | uppercaseFirst }}</div>
+        <div class="user-name text-center">{{ profileName }}</div>
+        <div class="user-role text-center text-muted">{{ profileEmail }}</div>
       </div>
     </div>
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Atribuciones</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            Analista programador .NET Banco Promerica Guatemala
           </div>
         </div>
       </div>
 
       <div class="user-skills user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Skills</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Tareas</span></div>
         <div class="user-bio-section-body">
           <div class="progress-item">
-            <span>Vue</span>
+            <span>Evaluación desempeño</span>
             <el-progress :percentage="70" />
           </div>
           <div class="progress-item">
-            <span>JavaScript</span>
-            <el-progress :percentage="18" />
+            <span>Curso 1</span>
+            <el-progress :percentage="80" />
           </div>
           <div class="progress-item">
-            <span>Css</span>
+            <span>Curso 2</span>
             <el-progress :percentage="12" />
           </div>
           <div class="progress-item">
-            <span>ESLint</span>
+            <span>Factura mensual</span>
             <el-progress :percentage="100" status="success" />
           </div>
         </div>
@@ -62,6 +62,9 @@ export default {
       type: Object,
       default: () => {
         return {
+          profilePicture: '',
+          profileName: '',
+          profileEmail: '',
           name: '',
           email: '',
           avatar: '',
@@ -69,6 +72,19 @@ export default {
         }
       }
     }
+  },
+  created() {
+    this.asignaDatos()
+    console.log(this.profilePicture)
+  },
+  methods: {
+    // Aquí puedes agregar tus métodos
+    asignaDatos() {
+      this.profilePicture = window.profilePicture
+      this.profileEmail = window.profileEmail
+      this.profileName = window.profileName
+    }
+    // ...
   }
 }
 </script>

@@ -51,13 +51,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="right" label="Monto">
+      <el-table-column align="right" label="Monto Facturado">
         <template slot-scope="{row}">
           <span>{{ row.currency+' '+formatDecimal(row.amount_invoice) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column align="right" label="Retención">
+        <template slot-scope="{row}">
+          <span>{{ row.currency+' '+formatDecimal(row.retencion) }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="right" label="Total sin Retención">
+        <template slot-scope="{row}">
+          <span>{{ row.currency+' '+formatDecimal(row.inretencion) }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Acciones" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row,}">
           <el-button type="primary" size="mini" @click="handleView(row.sample_desc_invoice)">
             Ver
@@ -148,8 +160,10 @@ export default {
 
         for (let i = 0; i < this.list.length; i++) {
           this.list[i].sample_desc_invoice = 'https://puntual-imagenes.s3.amazonaws.com/' + this.list[i].sample_desc_invoice
-          this.list[i].formula_column = '=HIPERVINCULO(G2)'
+          this.list[i].formula_column = '=HIPERVINCULO(I2)'
           // console.log(this.list[i].sample_desc_invoice)
+          this.list[i].retencion = this.list[i].amount_invoice * 0.05
+          this.list[i].inretencion = this.list[i].amount_invoice - this.list[i].retencion
         }
 
         console.log(this.list)
@@ -192,8 +206,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['ID_FACTURA', 'NOMBRE_EMPLEADO', 'SERIE', 'NUMERO', 'FECHA_FACTURA', 'MONTO', 'NOMBRE_IMAGEN', 'VICULO_IMAGEN']
-        const filterVal = ['id_recep_invoice', 'name_employe', 'serie_number_invoice', 'number_invoice', 'date_invoice', 'amount_invoice', 'sample_desc_invoice', 'formula_column']
+        const tHeader = ['ID_FACTURA', 'NOMBRE_EMPLEADO', 'SERIE', 'NUMERO', 'FECHA_FACTURA', 'MONTO', 'RETENCION', 'MONTO MENOS RETENCION', 'NOMBRE_IMAGEN', 'VICULO_IMAGEN']
+        const filterVal = ['id_recep_invoice', 'name_employe', 'serie_number_invoice', 'number_invoice', 'date_invoice', 'amount_invoice', 'retencion', 'inretencion', 'sample_desc_invoice', 'formula_column']
         const data = this.formatJson(filterVal)
 
         excel.export_json_to_excel({

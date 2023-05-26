@@ -149,6 +149,11 @@ export default {
       console.log('name', decodedToken.given_name)
       console.log('email', decodedToken.email)
       console.log('picture', decodedToken.picture)
+
+      window.profilePicture = decodedToken.picture
+      window.profileName = decodedToken.name
+      window.profileEmail = decodedToken.email
+
       this.logni13()
     },
     startGoogleSignIn() {
