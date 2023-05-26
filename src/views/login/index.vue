@@ -56,10 +56,9 @@
           <span style="margin-right:18px;">Username : editor</span>
           <span>Password : any</span>
         </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
+        <div>
+          <el-button @click="startGoogleSignIn">Iniciar sesión con Google</el-button>
+        </div>
       </div>
     </el-form>
 
@@ -77,6 +76,7 @@
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
 import axios from 'axios'
+import jwt_decode from 'jwt-decode'
 
 export default {
   name: 'Login',
@@ -110,7 +110,8 @@ export default {
       loading: false,
       showDialog: false,
       redirect: undefined,
-      otherQuery: {}
+      otherQuery: {},
+      isLogin: false
     }
   },
   watch: {
@@ -139,6 +140,29 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    handleCredentialResponse(response) {
+      // Aquí puedes manejar la respuesta de Google OAuth
+      console.log(response.credential)
+
+      const decodedToken = jwt_decode(response.credential)
+
+      console.log('name', decodedToken.given_name)
+      console.log('email', decodedToken.email)
+      console.log('picture', decodedToken.picture)
+      this.logni13()
+    },
+    startGoogleSignIn() {
+      console.log('entre')
+      const autoLoadConfig = {
+        client_id: '125562401752-fr2ooeomg4o2ej6k9hv15cmllb59nq4h.apps.googleusercontent.com',
+        callback: this.handleCredentialResponse
+      }
+
+      // eslint-disable-next-line no-undef
+      google.accounts.id.initialize(autoLoadConfig)
+      // eslint-disable-next-line no-undef
+      google.accounts.id.prompt()
+    },
     logni13() {
       axios.post('http://23.23.76.112:3030/puntual_logni13',
         '{ "usr": "josego", "pass": "sobrenumerosidad" }').then((response) => {

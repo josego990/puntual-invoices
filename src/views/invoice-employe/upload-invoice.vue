@@ -108,10 +108,10 @@
         </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogCreateEmployeVisible = false">
+        <el-button @click="dialogCreateInvoiceVisible = false">
           Cerrar
         </el-button>
-        <el-button type="primary" @click="submitFile()">
+        <el-button type="primary" @click="validateInvoicePdf()">
           Crear
         </el-button>
       </div>
@@ -151,6 +151,7 @@ export default {
   },
   data() {
     return {
+      pdfContent: null,
       file: null,
       invoiceSelected: false,
       dialogFormVisible: false,
@@ -288,6 +289,7 @@ export default {
       const fileExtension = fileName.split('.').pop()
       if (fileExtension === 'pdf') {
         this.invoiceSelected = true
+        //  this.readPDFContent()
       } else {
         this.$message({
           message: 'La factura debe ser formato PDF.',
@@ -297,6 +299,72 @@ export default {
       }
       console.log(this.file.name)
       this.temp_ins.sample_desc_invoice = this.file.name
+    },
+    readPDFContent() {
+      if (!this.file) {
+        return
+      }
+
+      const reader = new FileReader()
+
+      reader.onload = (event) => {
+        const text = event.target.result
+        this.pdfContent = text
+        console.log(this.pdfContent)
+      }
+
+      reader.onerror = (event) => {
+        console.error('Error al leer el archivo PDF:', event.target.error)
+      }
+
+      reader.readAsText(this.file)
+    },
+    validateInvoicePdf() {
+      if (this.invoiceSelected) {
+        const formData = new FormData()
+        formData.append('file', this.file)
+
+        this.$refs['dataEmpForm'].validate((valid) => {
+          if (valid) {
+            this.createLoading = true
+            axios.post('http://23.23.76.112:3030/validate-invoice-pdf',
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'i_c': '1',
+                  'n_f': this.file.name,
+                  'd_e': '01/01/2024'
+                },
+                timeout: 5000 // Timeout de 5 segundos (5000 milisegundos)
+              }
+            ).then((res) => {
+              if (res.data === 'SUCCESS') {
+                console.log('Factura válida!')
+                this.submitFile()
+              } else {
+                this.$message({
+                  message: res.data,
+                  type: 'error'
+                })
+                this.createLoading = false
+              }
+            }).catch((error) => {
+              console.log('FAILURE!!', error)
+              this.$message({
+                message: error + ' Es posible que el archivo esté corrupto.',
+                type: 'error'
+              })
+              this.createLoading = false
+            })
+          }
+        })
+      } else {
+        this.$message({
+          message: 'No ha seleccionado un archivo válido.',
+          type: 'error'
+        })
+      }
     },
     submitFile() {
       if (this.invoiceSelected) {
@@ -318,7 +386,7 @@ export default {
               }
             ).then((res) => {
               if (res.data === 'SUCCESS') {
-                console.log('PTA MADRE!')
+                console.log('Archivo cargado!')
                 this.insertInvoice()
               }
             }).catch((error) => {
@@ -348,7 +416,7 @@ export default {
     soloNumeros(event) {
       // Obtiene el código de la tecla presionada
       const codigoTecla = event.keyCode || event.which
-      console.log('codTecle: ' + codigoTecla)
+      // console.log('codTecle: ' + codigoTecla)
       // Permite solo números (códigos de teclas del 0 al 9)
       if ((codigoTecla >= 48 && codigoTecla <= 57) || (codigoTecla >= 96 && codigoTecla <= 105) || (codigoTecla === 8) || (codigoTecla === 9)) {
         return true
@@ -359,7 +427,7 @@ export default {
     soloNumerosYpunto(event) {
       // Obtiene el código de la tecla presionada
       const codigoTecla = event.keyCode || event.which
-      console.log('codTecle: ' + codigoTecla)
+      // console.log('codTecle: ' + codigoTecla)
       // Permite solo números (códigos de teclas del 0 al 9)
       if ((codigoTecla >= 48 && codigoTecla <= 57) || (codigoTecla >= 96 && codigoTecla <= 105) || (codigoTecla === 8) || (codigoTecla === 9) || (codigoTecla === 110) || (codigoTecla === 190)) {
         return true

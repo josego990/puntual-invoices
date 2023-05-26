@@ -52,7 +52,7 @@ const constantRoutes = [
       {
         path: 'index',
         component: 'views/documentation/index',
-        name: 'Documentation',
+        name: 'Documentationsex',
         meta: { title: 'Documentation', icon: 'documentation', affix: true }
       }
     ]
