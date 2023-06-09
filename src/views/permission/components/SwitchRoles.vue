@@ -25,6 +25,7 @@ export default {
         this.$store.dispatch('user/changeRoles', val).then(() => {
           this.$emit('change')
         })
+        console.log('val', val)
       }
     }
   }

@@ -7,34 +7,36 @@ const invEmpRouter = {
   component: Layout,
   redirect: 'noRedirect',
   name: 'Facturación Emp',
+  alwaysShow: true, // will always show the root menu
   meta: {
     title: 'Facturación',
-    icon: 'chart'
+    icon: 'documentation',
+    roles: ['admin', 'editor']
   },
   children: [
     {
       path: 'positions',
       component: () => import('@/views/invoice-employe/positions'),
       name: 'Positions',
-      meta: { title: 'Puestos', noCache: true, icon: 'peoples' }
+      meta: { title: 'Puestos', noCache: true, icon: 'peoples', roles: ['admin'] }
     },
     {
       path: 'projects',
       component: () => import('@/views/invoice-employe/projects'),
       name: 'Projects',
-      meta: { title: 'Proyectos', noCache: true, icon: 'el-icon-s-management' }
+      meta: { title: 'Proyectos', noCache: true, icon: 'el-icon-s-management', roles: ['admin'] }
     },
     {
       path: 'employes',
       component: () => import('@/views/invoice-employe/employes'),
       name: 'Employes',
-      meta: { title: 'Colaboradores', noCache: true, icon: 'people' }
+      meta: { title: 'Colaboradores', noCache: true, icon: 'people', roles: ['admin'] }
     },
     {
       path: 'invoices-employes',
       component: () => import('@/views/invoice-employe/invoices-employes'),
       name: 'InvoicesEmployes',
-      meta: { title: 'Facturas', noCache: true, icon: 'skill' }
+      meta: { title: 'Facturas', noCache: true, icon: 'skill', roles: ['admin'] }
     },
     {
       path: 'upload-invoice',
@@ -44,5 +46,4 @@ const invEmpRouter = {
     }
   ]
 }
-
 export default invEmpRouter

@@ -113,6 +113,8 @@ export default {
   },
   data() {
     return {
+      url_s3: window.url_s3,
+      url_api: window.url_api,
       file: null,
       invoiceSelected: false,
       dialogFormVisible: false,
@@ -153,13 +155,13 @@ export default {
 
       const body = JSON.stringify(filter)
 
-      axios.post('http://23.23.76.112:3030/get-invoices',
+      axios.post(this.url_api + 'get-invoices',
         body).then((response) => {
         // console.log(response.data)
         this.list = response.data
 
         for (let i = 0; i < this.list.length; i++) {
-          this.list[i].sample_desc_invoice = 'https://puntual-imagenes.s3.amazonaws.com/' + this.list[i].sample_desc_invoice
+          this.list[i].sample_desc_invoice = this.url_s3 + this.list[i].sample_desc_invoice
           this.list[i].formula_column = '=HIPERVINCULO(I2)'
           // console.log(this.list[i].sample_desc_invoice)
           this.list[i].retencion = this.list[i].amount_invoice * 0.05
@@ -180,12 +182,12 @@ export default {
 
       const body = JSON.stringify(filters)
 
-      axios.post('http://23.23.76.112:3030/get-invoices-by-filters-2',
+      axios.post(this.url_api + 'get-invoices-by-filters-2',
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
         for (let i = 0; i < this.list.length; i++) {
-          this.list[i].sample_desc_invoice = 'https://puntual-imagenes.s3.amazonaws.com/' + this.list[i].sample_desc_invoice
+          this.list[i].sample_desc_invoice = this.url_s3 + this.list[i].sample_desc_invoice
           // console.log(this.list[i].sample_desc_invoice)
         }
         this.listLoading = false

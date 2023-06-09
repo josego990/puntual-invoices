@@ -1,14 +1,14 @@
 <template>
   <div class="dashboard-editor-container">
     <div class=" clearfix">
-      <pan-thumb :image="avatar" style="float: left">
-        Your roles:
-        <span v-for="item in roles" :key="item" class="pan-info-roles">{{ item }}</span>
+      <pan-thumb :image="profilePicture" style="float: left">
+        Imagina..
+        <span v-for="item in roles" :key="item" class="pan-info-roles">lo grande que puedes ser.</span>
       </pan-thumb>
       <github-corner style="position: absolute; top: 0px; border: 0; right: 0;" />
       <div class="info-container">
-        <span class="display_name">{{ name }}</span>
-        <span style="font-size:20px;padding-top:20px;display:inline-block;">Editor's Dashboard</span>
+        <span class="display_name">Bienvenido</span>
+        <span style="font-size:20px;padding-top:20px;display:inline-block;">{{ profileName }}</span>
       </div>
     </div>
     <div>
@@ -27,7 +27,9 @@ export default {
   components: { PanThumb, GithubCorner },
   data() {
     return {
-      emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
+      emptyGif: null,
+      profilePicture: window.profilePicture,
+      profileName: window.profileName
     }
   },
   computed: {

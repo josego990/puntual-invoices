@@ -97,10 +97,13 @@ export default {
       }
     }
     return {
+      url_login: 'https://3.82.197.47:443/',
+      // url_login: 'https://localhost/',
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
+      login_mail: '',
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
@@ -127,6 +130,7 @@ export default {
     }
   },
   created() {
+    this.startGoogleSignIn()
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
@@ -142,12 +146,13 @@ export default {
   methods: {
     handleCredentialResponse(response) {
       // Aquí puedes manejar la respuesta de Google OAuth
-      console.log(response.credential)
+      // console.log(response.credential)
 
       const decodedToken = jwt_decode(response.credential)
 
       console.log('name', decodedToken.given_name)
       console.log('email', decodedToken.email)
+      this.login_mail = decodedToken.email
       console.log('picture', decodedToken.picture)
 
       window.profilePicture = decodedToken.picture
@@ -162,39 +167,59 @@ export default {
         client_id: '125562401752-fr2ooeomg4o2ej6k9hv15cmllb59nq4h.apps.googleusercontent.com',
         callback: this.handleCredentialResponse
       }
-
       // eslint-disable-next-line no-undef
       google.accounts.id.initialize(autoLoadConfig)
       // eslint-disable-next-line no-undef
       google.accounts.id.prompt()
     },
     logni13() {
-      axios.post('http://23.23.76.112:3030/puntual_logni13',
-        '{ "usr": "josego", "pass": "sobrenumerosidad" }').then((response) => {
-        console.log(response.data)
+      const filter = {}
+      filter.login_mail = this.login_mail
+      // comentar la siguiente linea:
+      filter.login_mail = 'josego990@gmail.com'
+
+      const body = JSON.stringify(filter)
+      console.log(body)
+      axios.post(this.url_login + 'puntual_logni14',
+        body).then((response) => {
+        // console.log(response.data)
 
         var token = response.data.token
+        // var role = response.data.user_data.name_role
 
-        console.log(token)
+        // console.log(token)
+        // console.log(role)
 
         // VALIDATE USER AND GET TOKEN HERE
         if (typeof token !== 'undefined') {
           window.localStorage.setItem('tkn', token)
 
+          this.loginForm.password = '111111'
+          this.loginForm.username = response.data.user_data.name_role
+          console.log('config_data', response.data.config_data)
+          // this.loginForm.username = 'admin'
+          window.url_api = response.data.config_data[0].value_config
+          window.url_api = 'https://localhost/'
+          window.url_s3 = response.data.config_data[1].value_config
+          // console.log('response.data.config_data[0].value_config', response.data.config_data[0].value_config)
+
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
-
             .then(() => {
               // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               // this.$router.push({ path: this.redirect || '/', query: '/#/dashboard' }) // al dashboard general
-              this.$router.push({ path: this.redirect || '/', query: '/#/employe-envoice/invoices-employes' }) // a facturación empleados
+              this.$router.push({ path: '/#/employe-envoice/invoices-employes' || '/', query:
+              '/#/employe-envoice/invoices-employes' }) // a facturación empleados
               this.loading = false
             })
             .catch(() => {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          this.$message({
+            message: 'Usuario no válido. Comuníquese con el administrador.',
+            type: 'error'
+          })
           return false
         }
       })
@@ -214,6 +239,7 @@ export default {
       })
     },
     handleLogin() {
+      console.log('Entra en handleLogin..')
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -236,6 +262,7 @@ export default {
         if (cur !== 'redirect') {
           acc[cur] = query[cur]
         }
+        console.log('acc', acc)
         return acc
       }, {})
     }

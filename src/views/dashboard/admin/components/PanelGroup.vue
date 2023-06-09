@@ -76,7 +76,7 @@ export default {
       this.$emit('handleSetLineChartData', type)
     },
     getDashboardData() {
-      axios.post('http://23.23.76.112:3030/get-dashboard-data',
+      axios.post('https://23.23.76.112:443/get-dashboard-data',
         '').then((response) => {
         console.log(response.data)
         this.cards_info = response.data

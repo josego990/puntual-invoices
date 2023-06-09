@@ -39,6 +39,7 @@ export default {
   },
   data() {
     return {
+      url_api: window.url_api,
       list: null,
       listLoading: true,
       listQuery: {
@@ -52,7 +53,7 @@ export default {
   },
   methods: {
     getProjectsList() {
-      axios.get('http://23.23.76.112:3030/get-projects',
+      axios.get(this.url_api + 'get-projects',
         '').then((response) => {
         console.log(response.data)
         this.list = response.data

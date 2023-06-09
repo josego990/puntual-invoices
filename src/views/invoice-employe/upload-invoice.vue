@@ -151,6 +151,8 @@ export default {
   },
   data() {
     return {
+      url_s3: window.url_s3,
+      url_api: window.url_api,
       pdfContent: null,
       file: null,
       invoiceSelected: false,
@@ -176,7 +178,7 @@ export default {
         sample_desc_invoice: [{ type: 'file', required: true, message: 'Moneda es requerido', trigger: 'change' }]
       },
       temp_ins: {
-        id_employe: 11,
+        id_employe: 1,
         serie_number: '',
         number_invoice: null,
         date_invoice: '',
@@ -205,11 +207,11 @@ export default {
     getInvoicesListById() {
       this.listLoading = true
       const filter = {}
-      filter.id_employe = 11
+      filter.id_employe = 1
 
       const body = JSON.stringify(filter)
 
-      axios.post('http://23.23.76.112:3030/get-invoices-by-id',
+      axios.post(this.url_api + 'get-invoices-by-id',
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -219,13 +221,13 @@ export default {
     handleFilter() {
       this.listLoading = true
       const filters = {}
-      filters.id_employe = 11
+      filters.id_employe = 1
       filters.year = this.year_filter
       filters.month = this.month_filter
 
       const body = JSON.stringify(filters)
 
-      axios.post('http://23.23.76.112:3030/get-invoices-by-filters',
+      axios.post(this.url_api + 'get-invoices-by-filters',
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -233,7 +235,7 @@ export default {
       })
     },
     getProjectsList() {
-      axios.get('http://23.23.76.112:3030/get-projects',
+      axios.get(this.url_api + 'get-projects',
         '').then((response) => {
         console.log(response.data)
         this.banks_list = response.data
@@ -241,11 +243,11 @@ export default {
       })
     },
     handleView(sample) {
-      window.open('https://puntual-imagenes.s3.amazonaws.com/' + sample, '_blank')
+      window.open(this.url_s3 + sample, '_blank')
     },
     resetTempIns() {
       this.temp_ins = {
-        id_employe: 11,
+        id_employe: 1,
         serie_number: '',
         number_invoice: null,
         date_invoice: '',
@@ -262,8 +264,9 @@ export default {
     insertInvoice() {
       const personaString = JSON.stringify(this.temp_ins)
       console.log('CANELITAS')
+      console.log(personaString)
 
-      axios.post('http://23.23.76.112:3030/create-invoice',
+      axios.post(this.url_api + 'create-invoice',
         personaString).then((response) => {
         console.log(response.data[0])
         if (response.data[0].RESULT === 'success') {
@@ -321,13 +324,14 @@ export default {
     },
     validateInvoicePdf() {
       if (this.invoiceSelected) {
+        const invoiceString = JSON.stringify(this.temp_ins)
         const formData = new FormData()
         formData.append('file', this.file)
-
+        formData.append('invoiceString', invoiceString)
         this.$refs['dataEmpForm'].validate((valid) => {
           if (valid) {
             this.createLoading = true
-            axios.post('http://23.23.76.112:3030/validate-invoice-pdf',
+            axios.post(this.url_api + 'validate-invoice-pdf',
               formData,
               {
                 headers: {
@@ -374,7 +378,7 @@ export default {
         this.$refs['dataEmpForm'].validate((valid) => {
           if (valid) {
             this.createLoading = true
-            axios.post('http://23.23.76.112:3030/upload-file-v2',
+            axios.post(this.url_api + 'upload-file-v2',
               formData,
               {
                 headers: {

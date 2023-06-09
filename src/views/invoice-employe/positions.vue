@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="name_filter" placeholder="Puesto" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Buscar
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -65,6 +65,7 @@
 <script>
 import { fetchPositionsList } from '@/api/article'
 import axios from 'axios'
+import store from '@/store'
 
 export default {
   name: 'InlineEditTable',
@@ -80,6 +81,7 @@ export default {
   },
   data() {
     return {
+      url_api: window.url_api,
       list: null,
       listLoading: true,
       dialogCreatePositionVisible: false,
@@ -101,10 +103,21 @@ export default {
   },
   created() {
     this.getPositionList()
+    this.pruebas()
   },
   methods: {
+    pruebas() {
+      const roles = store.getters.roles[0]
+      console.log('roles', roles)
+      if (roles === 'editor') {
+        this.$store.dispatch('user/changeRoles', 'admin').then(() => {
+          this.$emit('change')
+        })
+      }
+      console.log('roles', roles)
+    },
     getPositionList() {
-      axios.get('http://23.23.76.112:3030/get-positions',
+      axios.get(this.url_api + 'get-positions',
         '').then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -139,7 +152,7 @@ export default {
       const filter = {}
       filter.filter = this.name_filter
       const body = JSON.stringify(filter)
-      axios.post('http://23.23.76.112:3030/get-positions-filter',
+      axios.post(this.url_api + 'get-positions-filter',
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -152,7 +165,7 @@ export default {
         if (valid) {
           this.createLoading = true
           this.listLoading = true
-          axios.post('http://23.23.76.112:3030/create-position',
+          axios.post(this.url_api + 'create-position',
             personaString).then((response) => {
             console.log(response.data[0])
             if (response.data[0].RESULT === 'success') {

@@ -425,6 +425,7 @@ export default {
   },
   data() {
     return {
+      url_api: window.url_api,
       file: null,
       dialogFormVisible: false,
       dialogEditEmployeVisible: false,
@@ -510,7 +511,7 @@ export default {
   },
   methods: {
     getEmployesList() {
-      axios.get('http://23.23.76.112:3030/get-employes',
+      axios.get(this.url_api + 'get-employes',
         '').then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -522,7 +523,7 @@ export default {
       const filter = {}
       filter.filter = this.name_filter
       const body = JSON.stringify(filter)
-      axios.post('http://23.23.76.112:3030/get-employes-filter',
+      axios.post(this.url_api + 'get-employes-filter',
         body).then((response) => {
         console.log(response.data)
         this.list = response.data
@@ -530,7 +531,7 @@ export default {
       })
     },
     getPositionList() {
-      axios.get('http://23.23.76.112:3030/get-positions-list',
+      axios.get(this.url_api + 'get-positions-list',
         '').then((response) => {
         console.log(response.data)
         this.positions_list = response.data
@@ -538,7 +539,7 @@ export default {
       })
     },
     getBanksList() {
-      axios.get('http://23.23.76.112:3030/get-banks-list',
+      axios.get(this.url_api + 'get-banks-list',
         '').then((response) => {
         console.log(response.data)
         this.banks_list = response.data
@@ -621,7 +622,7 @@ export default {
         const formData = new FormData()
         formData.append('file', this.file)
 
-        axios.post('http://23.23.76.112:3030/upload-employes-excel',
+        axios.post(this.url_api + 'upload-employes-excel',
           formData,
           {
             headers: {
@@ -663,7 +664,7 @@ export default {
         if (valid) {
           this.dialogLoading = true
           this.listLoading = true
-          axios.post('http://23.23.76.112:3030/update-employe',
+          axios.post(this.url_api + 'update-employe',
             personaString).then((response) => {
             console.log(response.data[0])
             if (response.data[0].RESULT === 'success') {
@@ -685,7 +686,7 @@ export default {
         if (valid) {
           this.listLoading = true
           this.createLoading = true
-          axios.post('http://23.23.76.112:3030/create-employe',
+          axios.post(this.url_api + 'create-employe',
             personaString).then((response) => {
             console.log(response.data[0])
             if (response.data[0].RESULT === 'success') {

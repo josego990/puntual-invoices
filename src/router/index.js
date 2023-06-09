@@ -9,15 +9,15 @@ import Layout from '@/layout'
 /* Router Modules */
 import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
-import invEmpRouter from './modules/employe-invoice'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import invEmpRouter from './modules/employe-invoice'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
  *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
+ * hidden: false                   if set true, item will not show in the sidebar(default is false)
  * alwaysShow: true               if set true, will always show the root menu
  *                                if not set alwaysShow, when item has more than one children route,
  *                                it will becomes nested mode, otherwise not show the root menu
@@ -44,7 +44,7 @@ export const constantRoutes = [
   {
     path: '/redirect',
     component: Layout,
-    hidden: true,
+    hidden: false,
     children: [
       {
         path: '/redirect/:path(.*)',
@@ -55,24 +55,24 @@ export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
-    hidden: true
+    hidden: false
   },
   {
     path: '/auth-redirect',
     component: () => import('@/views/login/auth-redirect'),
-    hidden: true
+    hidden: false
   },
   {
     path: '/404',
     component: () => import('@/views/error-page/404'),
-    hidden: true
+    hidden: false
   },
   {
     path: '/401',
     component: () => import('@/views/error-page/401'),
-    hidden: true
+    hidden: false
   },
-  invEmpRouter,
+  // invEmpRouter,
   {
     path: '/',
     component: Layout,
@@ -80,7 +80,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/dashboard/index'), // CAMBIAR AQUI PARA REDIRECCIONAR A OTRO LADO JJG
         name: 'Dashboard',
         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
       }
@@ -95,7 +95,8 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/mipath/index'),
         name: 'MiPath',
-        meta: { title: 'MiPath', icon: 'documentation', affix: true }
+        meta: { title: 'MiPath', icon: 'documentation', affix: false },
+        hidden: false
       }
     ]
   },
@@ -108,7 +109,8 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/ventas/facturacion'),
         name: 'Ventas',
-        meta: { title: 'Ventas', icon: 'documentation', affix: true }
+        meta: { title: 'Ventas', icon: 'documentation' },
+        hidden: false
       }
     ]
   },
@@ -120,8 +122,9 @@ export const constantRoutes = [
       {
         path: 'index',
         component: () => import('@/views/ejemplo_menu/ejemplo_de_menu'),
-        name: 'Ventas',
-        meta: { title: 'Ejemplo Menu', icon: 'documentation', affix: true }
+        name: 'ejemplo_menu',
+        meta: { title: 'Ejemplo Menu', icon: 'documentation', affix: false },
+        hidden: false
       }
     ]
   },
@@ -134,7 +137,8 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/documentation/index'),
         name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
+        meta: { title: 'Documentation', icon: 'documentation' },
+        hidden: false
       }
     ]
   },
@@ -142,6 +146,7 @@ export const constantRoutes = [
     path: '/guide',
     component: Layout,
     redirect: '/guide/index',
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -155,13 +160,14 @@ export const constantRoutes = [
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
-    hidden: true,
+    hidden: false,
     children: [
       {
         path: 'index',
         component: () => import('@/views/profile/index'),
         name: 'Profile',
-        meta: { title: 'Profile', icon: 'user', noCache: true }
+        meta: { title: 'Profile', icon: 'user', noCache: true },
+        hidden: false
       }
     ]
   }
@@ -179,10 +185,11 @@ export const asyncRoutes = [
     redirect: '/permission/page',
     alwaysShow: true, // will always show the root menu
     name: 'Permission',
+    hidden: false,
     meta: {
       title: 'Permission',
       icon: 'lock',
-      roles: ['admin', 'editor'] // you can set roles in root nav
+      roles: ['admin'] // you can set roles in root nav
     },
     children: [
       {
@@ -214,7 +221,96 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  {
+    path: '/employe-envoice',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'Facturación Emp',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'Facturación',
+      icon: 'documentation',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'positions',
+        component: () => import('@/views/invoice-employe/positions'),
+        name: 'Positions',
+        meta: { title: 'Puestos', noCache: true, icon: 'peoples', roles: ['admin'] }
+      },
+      {
+        path: 'projects',
+        component: () => import('@/views/invoice-employe/projects'),
+        name: 'Projects',
+        meta: { title: 'Proyectos', noCache: true, icon: 'el-icon-s-management', roles: ['admin'] }
+      },
+      {
+        path: 'employes',
+        component: () => import('@/views/invoice-employe/employes'),
+        name: 'Employes',
+        meta: { title: 'Colaboradores', noCache: true, icon: 'people', roles: ['admin'] }
+      },
+      {
+        path: 'invoices-employes',
+        component: () => import('@/views/invoice-employe/invoices-employes'),
+        name: 'InvoicesEmployes',
+        meta: { title: 'Facturas', noCache: true, icon: 'skill', roles: ['admin'] }
+      },
+      {
+        path: 'upload-invoice',
+        component: () => import('@/views/invoice-employe/upload-invoice'),
+        name: 'UploadInvoice',
+        meta: { title: 'Subir Factura', noCache: true, icon: 'el-icon-upload' }
+      }
+    ]
+  },
+  {
+    path: '/sales',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'Ventas',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'Ventas',
+      icon: 'documentation',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'sale-point',
+        component: () => import('@/views/sales/sale-point'),
+        name: 'SalePoint',
+        meta: { title: 'Punto de Venta', noCache: true, icon: 'peoples', roles: ['admin', 'editor'] }
+      },
+      {
+        path: 'projects',
+        component: () => import('@/views/invoice-employe/projects'),
+        name: 'Projects',
+        meta: { title: 'Facturas Venta', noCache: true, icon: 'el-icon-s-management', roles: ['admin'] }
+      }
+    ]
+  },
+  {
+    path: '/inventory',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'Inventory',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'Inventario',
+      icon: 'list',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'products',
+        component: () => import('@/views/inventory/products'),
+        name: 'Products',
+        meta: { title: 'Productos', noCache: true, icon: 'el-icon-s-goods', roles: ['admin'] }
+      }
+    ]
+  },
   {
     path: '/icon',
     component: Layout,
@@ -223,7 +319,8 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/icons/index'),
         name: 'Icons',
-        meta: { title: 'Icons', icon: 'icon', noCache: true }
+        meta: { title: 'Icons', icon: 'icon', noCache: true },
+        hidden: false
       }
     ]
   },
@@ -232,8 +329,8 @@ export const asyncRoutes = [
   componentsRouter,
   chartsRouter,
 
-  nestedRouter,
-  tableRouter,
+  // nestedRouter,
+  // tableRouter,
 
   {
     path: '/example',
@@ -244,6 +341,7 @@ export const asyncRoutes = [
       title: 'Example',
       icon: 'el-icon-s-help'
     },
+    hidden: false,
     children: [
       {
         path: 'create',
@@ -256,7 +354,7 @@ export const asyncRoutes = [
         component: () => import('@/views/example/edit'),
         name: 'EditArticle',
         meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-        hidden: true
+        hidden: false
       },
       {
         path: 'list',
@@ -270,6 +368,7 @@ export const asyncRoutes = [
   {
     path: '/tab',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -285,6 +384,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: 'noRedirect',
     name: 'ErrorPages',
+    hidden: false,
     meta: {
       title: 'Error Pages',
       icon: '404'
@@ -308,6 +408,7 @@ export const asyncRoutes = [
   {
     path: '/error-log',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'log',
@@ -323,6 +424,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/excel/export-excel',
     name: 'Excel',
+    hidden: false,
     meta: {
       title: 'Excel',
       icon: 'excel'
@@ -361,6 +463,7 @@ export const asyncRoutes = [
     redirect: '/zip/download',
     alwaysShow: true,
     name: 'Zip',
+    hidden: false,
     meta: { title: 'Zip', icon: 'zip' },
     children: [
       {
@@ -376,6 +479,7 @@ export const asyncRoutes = [
     path: '/pdf',
     component: Layout,
     redirect: '/pdf/index',
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -385,15 +489,17 @@ export const asyncRoutes = [
       }
     ]
   },
+
   {
     path: '/pdf/download',
     component: () => import('@/views/pdf/download'),
-    hidden: true
+    hidden: false
   },
 
   {
     path: '/theme',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -407,6 +513,7 @@ export const asyncRoutes = [
   {
     path: '/clipboard',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -420,6 +527,7 @@ export const asyncRoutes = [
   {
     path: 'external-link',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'https://github.com/PanJiaChen/vue-element-admin',
@@ -429,7 +537,7 @@ export const asyncRoutes = [
   },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: false }
 ]
 
 const createRouter = () => new Router({
