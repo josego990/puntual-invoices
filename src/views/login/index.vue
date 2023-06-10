@@ -199,7 +199,7 @@ export default {
           console.log('config_data', response.data.config_data)
           // this.loginForm.username = 'admin'
           window.url_api = response.data.config_data[0].value_config
-          window.url_api = 'https://localhost/'
+          // window.url_api = 'https://localhost/'
           window.url_s3 = response.data.config_data[1].value_config
           // console.log('response.data.config_data[0].value_config', response.data.config_data[0].value_config)
 

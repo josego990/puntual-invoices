@@ -140,9 +140,10 @@
           <el-input v-model="search_prod" placeholder="Buscar Productos" style="margin:10px;padding-right: 20px" prefix-icon="el-icon-search" />
         </div>
         <div style="margin:10px">
-          <el-table bstripe border fit highlight-current-row style="width: 100%" height="300" fixed :cell-style="{padding: '0', height: '25px'}" :header-cell-style="{ background: '#96735E', color: 'white' }" :data="tableData.filter(data => !search || data.marc.toLowerCase().includes(search.toLowerCase()))">
-            <el-table-column header-fixed align="left" min-width="130" header-align="center" label="Producto" prop="prod" />
-            <el-table-column prop="marc">
+          <el-table v-loading="prd_list_loading" bstripe border fit highlight-current-row style="width: 100%" height="300" fixed :cell-style="{padding: '0', height: '25px'}" :header-cell-style="{ background: '#96735E', color: 'white' }" :data="tableData.filter(data => !search || data.marca.toLowerCase().includes(search.toLowerCase()))" @click.native="mostrar($event)" >
+
+            <el-table-column header-fixed align="left" min-width="130" header-align="center" label="Producto" prop="nombre" />
+            <el-table-column prop="marca">
               <template slot="header">
                 <el-input
                   v-model="search"
@@ -152,18 +153,11 @@
                 />
               </template>
             </el-table-column>
-            <el-table-column label="Existe" prop="exist" />
-            <el-table-column label="Precio" prop="prec" />
-            <el-table-column
-              prop="ofer"
-              label="Oferta"
-              width="100"
-              :filters="[{ text: 'Oferta', value: 'Oferta' }, { text: 'Normal', value: 'Normal' }]"
-              :filter-method="filterTag"
-              filter-placement="bottom-end"
-            >
-              <template slot-scope="scope">
-                <el-tag :type="scope.row.ofer === 'Oferta' ? 'warning' : 'primary'" disable-transitions>{{ scope.row.ofer }}</el-tag>
+            <el-table-column align="center" label="Existe" prop="existencia" />
+
+            <el-table-column align="center" label="Precio">
+              <template slot-scope="{row}">
+                <span>{{ formatDecimal(row.precio_venta) }}</span>
               </template>
             </el-table-column>
             <el-table-column>
@@ -174,6 +168,10 @@
           </el-table>
 
         </div>
+        
+      </div>
+      <div style="width:100%;height:100%;text-align:center">
+        <el-image style="width: 250px; height: 250px" :src="url_current" :fit="fit" />
       </div>
     </el-col>
   </el-row>
@@ -181,8 +179,8 @@
 </template>
 
 <script>
-// import axios from 'axios'
-import store from '@/store'
+
+import axios from 'axios'
 
 export default {
   name: 'InlineEditTable',
@@ -198,39 +196,11 @@ export default {
   },
   data() {
     return {
-      tableData: [{
-        cod: '1',
-        princ: 'ACETAMINOFEN (PARACETAMOL)',
-        prod: 'BEBETINA 80MG 100 TABLETA',
-        marc: 'PLOUGH-VIDES',
-        prec: 68.88,
-        exist: 76,
-        ofer: 'Oferta'
-      }, {
-        cod: '1',
-        princ: 'ACETAMINOFEN (PARACETAMOL)',
-        prod: 'ANTIGRIP 100 TABLETA',
-        marc: 'ASTA MEDICA',
-        prec: 518.84,
-        exist: 48,
-        ofer: 'Oferta'
-      }, {
-        cod: '1',
-        princ: 'ACETAMINOFEN (PARACETAMOL)+CODEINA',
-        prod: 'ACETAMIN CC 325MG/15MG 100 COMPRIMIDO',
-        marc: 'EUROFARMA',
-        prec: 620.43,
-        exist: 34,
-        ofer: 'Normal'
-      }, {
-        cod: '1',
-        princ: 'ACETAMINOFEN (PARACETAMOL)+CAFEINA',
-        prod: 'ACCION PLUS 204 TABLETA',
-        marc: 'LANCASCO - ACCION',
-        prec: 116.17,
-        exist: 56,
-        ofer: 'Oferta'
-      }],
+      url_current: '',
+      prd_list_loading: false,
+      url_s3: window.url_s3,
+      url_api: window.url_api,
+      tableData: [],
       search: '',
       search_prod: '',
       switch_pay: true,
@@ -313,9 +283,29 @@ export default {
     }
   },
   created() {
-    this.pruebas()
+    this.getProductsList()
   },
   methods: {
+    mostrar(event) {
+      const rowData = this.obtenerFila(event.target)
+      // Lógica para mostrar los valores de todas las columnas de la fila
+      console.log('Valores de la fila:', rowData.cod_producto)
+      this.url_current = this.url_s3 + rowData.cod_producto + '.JPG'
+    },
+    obtenerFila(target) {
+      const rowElement = target.closest('.el-table__row')
+      const rowIndex = Array.from(rowElement.parentNode.children).indexOf(rowElement)
+      return this.tableData[rowIndex]
+    },
+    getProductsList() {
+      this.prd_list_loading = true
+      axios.post(this.url_api + 'get-products',
+        '').then((response) => {
+        console.log(response.data)
+        this.tableData = response.data
+        this.prd_list_loading = false
+      })
+    },
     filterTag(value, row) {
       return row.ofer === value
     },
@@ -337,15 +327,11 @@ export default {
     handleChange(value) {
       console.log(this.sale_list)
     },
-    pruebas() {
-      const roles = store.getters.roles[0]
-      console.log('roles', roles)
-      if (roles === 'editor') {
-        this.$store.dispatch('user/changeRoles', 'admin').then(() => {
-          this.$emit('change')
-        })
-      }
-      console.log('roles', roles)
+    formatDecimal(monto) {
+      var decimal = monto.toFixed(2)
+      var parts = decimal.toString().split('.')
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return parts.join('.')
     }
   }
 }

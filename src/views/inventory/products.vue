@@ -1,12 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="year_filter" placeholder="Año" style="width: 100px;" class="filter-item" />
-      <el-input v-model="month_filter" placeholder="Mes" style="width: 100px;" class="filter-item" />
+      <el-input v-model="name_filter" placeholder="Mes" style="width: 100px;" class="filter-item" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Buscar
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-upload" @click="upl_pirate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-upload" @click="none">
         Upload Pirate
       </el-button>
     </div>
@@ -25,6 +24,12 @@
       <el-table-column align="center" label="Nombre">
         <template slot-scope="{row}">
           <small><span>{{ row.nombre }}</span></small>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Laboratorio">
+        <template slot-scope="{row}">
+          <span>{{ row.proveedor }}</span>
         </template>
       </el-table-column>
 
@@ -48,17 +53,23 @@
 
       <el-table-column align="center" label="Precio">
         <template slot-scope="{row}">
-          <span>{{ row.precio_venta }}</span>
+          <span>{{ formatDecimal(row.precio_venta) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row,}">
-          <el-button type="primary" size="mini" @click="handleView(row.sample_desc_invoice)">
-            Ver
-          </el-button>
+      <el-table-column align="center" label="Ver">
+        <template slot-scope="{row}">
+          <el-popover
+            placement="left"
+            width="400"
+            trigger="hover"
+          >
+            <el-image style="width: 400px; height: 400px" :src="url_s3 + row.cod_producto + '.JPG'" :fit="fit" />
+            <el-button slot="reference">Imagen</el-button>
+          </el-popover>
         </template>
       </el-table-column>
+
     </el-table>
 
     <el-dialog v-loading="createLoading" title="Subir Productos" :visible.sync="dialogCreateInvoiceVisible">
@@ -147,58 +158,58 @@ export default {
     return {
       upl_prods:
       [
-    {
-        "PRPPRODId": 1003880,
-        "LABNOMBRE": "PFIZER",
-        "PRPUMDId": "CAJA",
-        "PRPPrecio": 891.160000000,
-        "PrecioConIva": 998.099200,
-        "PRODNombre": "VIAGRA 100 MG * 4 TAB   - CAJA",
-        "IVA": 1.12000,
-        "Orden": 3,
-        "PRODReqPrescripcion": 1,
-        "MODALIDAD": "NA",
-        "txt_Button": "*VIAGRA 100 MG x 4 TAB * a Q998.10/CAJA",
-        "txt_Detalle": "{\"Codigo\":1003880,\"Nombre\":\"VIAGRA 100 MG * 4 TAB  \",\"Precio\":998.10,\"Cantidad\":",
-        "Descuento": "NA",
-        "PRPPrecioUnitarioConIvaSinPromocion": 998.099200000,
-        "PRMId": 0
-    },
-    {
-        "PRPPRODId": 1003882,
-        "LABNOMBRE": "PFIZER",
-        "PRPUMDId": "CAJA",
-        "PRPPrecio": 702.500000000,
-        "PrecioConIva": 786.800000,
-        "PRODNombre": "VIAGRA 50 MG * 4 TAB  - CAJA",
-        "IVA": 1.12000,
-        "Orden": 3,
-        "PRODReqPrescripcion": 1,
-        "MODALIDAD": "NA",
-        "txt_Button": "*VIAGRA 50 MG x 4 TAB* a Q786.80/CAJA",
-        "txt_Detalle": "{\"Codigo\":1003882,\"Nombre\":\"VIAGRA 50 MG * 4 TAB \",\"Precio\":786.80,\"Cantidad\":",
-        "Descuento": "NA",
-        "PRPPrecioUnitarioConIvaSinPromocion": 786.800000000,
-        "PRMId": 0
-    },
-    {
-        "PRPPRODId": 1003881,
-        "LABNOMBRE": "PFIZER",
-        "PRPUMDId": "UNIDAD",
-        "PRPPrecio": 169.640000000,
-        "PrecioConIva": 189.996800,
-        "PRODNombre": "VIAGRA 50 MG * 1 TAB  - UNIDAD",
-        "IVA": 1.12000,
-        "Orden": 3,
-        "PRODReqPrescripcion": 1,
-        "MODALIDAD": "NA",
-        "txt_Button": "*VIAGRA 50 MG x 1 TAB* a Q190.00/UNIDAD",
-        "txt_Detalle": "{\"Codigo\":1003881,\"Nombre\":\"VIAGRA 50 MG * 1 TAB \",\"Precio\":190.00,\"Cantidad\":",
-        "Descuento": "NA",
-        "PRPPrecioUnitarioConIvaSinPromocion": 189.996800000,
-        "PRMId": 0
-    }
-],
+        {
+          "PRPPRODId": 1003880,
+          "LABNOMBRE": "PFIZER",
+          "PRPUMDId": "CAJA",
+          "PRPPrecio": 891.160000000,
+          "PrecioConIva": 998.099200,
+          "PRODNombre": "VIAGRA 100 MG * 4 TAB   - CAJA",
+          "IVA": 1.12000,
+          "Orden": 3,
+          "PRODReqPrescripcion": 1,
+          "MODALIDAD": "NA",
+          "txt_Button": "*VIAGRA 100 MG x 4 TAB * a Q998.10/CAJA",
+          "txt_Detalle": "{\"Codigo\":1003880,\"Nombre\":\"VIAGRA 100 MG * 4 TAB  \",\"Precio\":998.10,\"Cantidad\":",
+          "Descuento": "NA",
+          "PRPPrecioUnitarioConIvaSinPromocion": 998.099200000,
+          "PRMId": 0
+        },
+        {
+          "PRPPRODId": 1003882,
+          "LABNOMBRE": "PFIZER",
+          "PRPUMDId": "CAJA",
+          "PRPPrecio": 702.500000000,
+          "PrecioConIva": 786.800000,
+          "PRODNombre": "VIAGRA 50 MG * 4 TAB  - CAJA",
+          "IVA": 1.12000,
+          "Orden": 3,
+          "PRODReqPrescripcion": 1,
+          "MODALIDAD": "NA",
+          "txt_Button": "*VIAGRA 50 MG x 4 TAB* a Q786.80/CAJA",
+          "txt_Detalle": "{\"Codigo\":1003882,\"Nombre\":\"VIAGRA 50 MG * 4 TAB \",\"Precio\":786.80,\"Cantidad\":",
+          "Descuento": "NA",
+          "PRPPrecioUnitarioConIvaSinPromocion": 786.800000000,
+          "PRMId": 0
+        },
+        {
+          "PRPPRODId": 1003881,
+          "LABNOMBRE": "PFIZER",
+          "PRPUMDId": "UNIDAD",
+          "PRPPrecio": 169.640000000,
+          "PrecioConIva": 189.996800,
+          "PRODNombre": "VIAGRA 50 MG * 1 TAB  - UNIDAD",
+          "IVA": 1.12000,
+          "Orden": 3,
+          "PRODReqPrescripcion": 1,
+          "MODALIDAD": "NA",
+          "txt_Button": "*VIAGRA 50 MG x 1 TAB* a Q190.00/UNIDAD",
+          "txt_Detalle": "{\"Codigo\":1003881,\"Nombre\":\"VIAGRA 50 MG * 1 TAB \",\"Precio\":190.00,\"Cantidad\":",
+          "Descuento": "NA",
+          "PRPPrecioUnitarioConIvaSinPromocion": 189.996800000,
+          "PRMId": 0
+        }
+      ],
       url_s3: window.url_s3,
       url_api: window.url_api,
       pdfContent: null,
@@ -283,7 +294,7 @@ export default {
       })
     },
     getProductsList() {
-      axios.post('https://localhost/' + 'get-products',
+      axios.post(this.url_api + 'get-products',
         '').then((response) => {
         console.log(response.data)
         this.product_list = response.data
@@ -291,7 +302,7 @@ export default {
       })
     },
     upl_pirate() {
-      axios.post('https://localhost/' + 'upload-files-to-s3-pirate',
+      axios.post(this.url_api + 'upload-files-to-s3-pirate',
         '').then((response) => {
         this.$message({
           message: response.data,
@@ -360,77 +371,10 @@ export default {
       console.log(this.file.name)
       this.temp_ins.sample_desc_invoice = this.file.name
     },
-    readPDFContent() {
-      if (!this.file) {
-        return
-      }
-
-      const reader = new FileReader()
-
-      reader.onload = (event) => {
-        const text = event.target.result
-        this.pdfContent = text
-        console.log(this.pdfContent)
-      }
-
-      reader.onerror = (event) => {
-        console.error('Error al leer el archivo PDF:', event.target.error)
-      }
-
-      reader.readAsText(this.file)
-    },
-    validateInvoicePdf() {
-      if (this.invoiceSelected) {
-        const invoiceString = JSON.stringify(this.temp_ins)
-        const formData = new FormData()
-        formData.append('file', this.file)
-        formData.append('invoiceString', invoiceString)
-        this.$refs['dataEmpForm'].validate((valid) => {
-          if (valid) {
-            this.createLoading = true
-            axios.post(this.url_api + 'validate-invoice-pdf',
-              formData,
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                  'i_c': '1',
-                  'n_f': this.file.name,
-                  'd_e': '01/01/2024'
-                },
-                timeout: 5000 // Timeout de 5 segundos (5000 milisegundos)
-              }
-            ).then((res) => {
-              if (res.data === 'SUCCESS') {
-                console.log('Factura válida!')
-                this.submitFile()
-              } else {
-                this.$message({
-                  message: res.data,
-                  type: 'error'
-                })
-                this.createLoading = false
-              }
-            }).catch((error) => {
-              console.log('FAILURE!!', error)
-              this.$message({
-                message: error + ' Es posible que el archivo esté corrupto.',
-                type: 'error'
-              })
-              this.createLoading = false
-            })
-          }
-        })
-      } else {
-        this.$message({
-          message: 'No ha seleccionado un archivo válido.',
-          type: 'error'
-        })
-      }
-    },
     uploadProductsBatch() {
       const productosString = JSON.stringify(this.upl_prods)
 
-      axios.post('https://localhost/' + 'upload-products-batch',
+      axios.post(this.url_api + 'upload-products-batch',
         productosString
       ).then((res) => {
         if (res.data === 'SUCCESS') {
