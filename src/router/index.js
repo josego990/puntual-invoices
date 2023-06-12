@@ -285,9 +285,9 @@ export const asyncRoutes = [
       },
       {
         path: 'projects',
-        component: () => import('@/views/invoice-employe/projects'),
+        component: () => import('@/views/sales/dash-ventas-real-time.vue'),
         name: 'Projects',
-        meta: { title: 'Facturas Venta', noCache: true, icon: 'el-icon-s-management', roles: ['admin'] }
+        meta: { title: 'Dash Ventas RT', noCache: true, icon: 'el-icon-s-management', roles: ['admin'] }
       }
     ]
   },

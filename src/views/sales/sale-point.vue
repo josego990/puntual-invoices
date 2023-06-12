@@ -1,5 +1,5 @@
 <template>
-  <el-row>
+  <el-row style="background:#f0e9f4">
     <el-col :span="12">
       <div class="grid-content bg-purple">
         <div>
@@ -7,29 +7,29 @@
           <div style="margin:10px">
 
             <el-table stripe :data="sale_list" border fit highlight-current-row style="width: 100%" height="300" fixed :cell-style="{padding: '0', height: '25px'}" :header-cell-style="{ background: '#96735E', color: 'white' }">
-              <el-table-column header-fixed align="left" min-width="120" header-align="center" label="Producto">
+              <el-table-column header-fixed align="left" min-width="120px" header-align="center" label="Producto">
                 <template slot-scope="{row}">
                   <span>{{ row.product }}</span>
                 </template>
               </el-table-column>
-              <el-table-column align="center" label="Cantidad">
+              <el-table-column align="center" label="Cantidad" prop="quantity">
                 <template slot-scope="{row}">
-                  <el-input-number v-model="row.quantity" :max="99" :min="1" style="width: 100%" size="mini" @change="handleChange" />
+                  <el-input-number v-model="row.quantity" :max="99" :min="1" style="width: 100%" size="mini" @change="handleChangeQuantity(row)" />
                 </template>
               </el-table-column>
               <el-table-column align="center" label="Precio GTQ">
                 <template slot-scope="{row}">
-                  <span>{{ row.price }}</span>
+                  <span>{{ formatDecimal(row.price) }}</span>
                 </template>
               </el-table-column>
               <el-table-column align="center" label="Subtotal GTQ">
                 <template slot-scope="{row}">
-                  <span>{{ row.subtotal }}</span>
+                  <span>{{ formatDecimal(row.subtotal) }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="X" align="center" width="50" class-name="small-padding fixed-width">
-                <template>
-                  <el-button type="danger" icon="el-icon-delete" circle />
+                <template slot-scope="scope">
+                  <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(scope.$index,scope.row)" />
                 </template>
               </el-table-column>
             </el-table>
@@ -80,7 +80,7 @@
                       </el-col>
                       <el-col :span="12">
                         <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font">5,236.00</span>
+                          <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
                         </div>
                       </el-col>
                     </el-row>
@@ -93,7 +93,7 @@
                       </el-col>
                       <el-col :span="12">
                         <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font">6.00</span>
+                          <span class="custom-font">0.00</span>
                         </div>
                       </el-col>
                     </el-row>
@@ -106,7 +106,7 @@
                       </el-col>
                       <el-col :span="12">
                         <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font">689.25</span>
+                          <span class="custom-font">0.00</span>
                         </div>
                       </el-col>
                     </el-row>
@@ -119,7 +119,7 @@
                       </el-col>
                       <el-col :span="12">
                         <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font" style="font-weight: bold;">6,042.75</span>
+                          <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
                         </div>
                       </el-col>
                     </el-row>
@@ -140,9 +140,33 @@
           <el-input v-model="search_prod" placeholder="Buscar Productos" style="margin:10px;padding-right: 20px" prefix-icon="el-icon-search" />
         </div>
         <div style="margin:10px">
-          <el-table v-loading="prd_list_loading" bstripe border fit highlight-current-row style="width: 100%" height="300" fixed :cell-style="{padding: '0', height: '25px'}" :header-cell-style="{ background: '#96735E', color: 'white' }" :data="tableData.filter(data => !search || data.marca.toLowerCase().includes(search.toLowerCase()))" @click.native="mostrar($event)" >
-
-            <el-table-column header-fixed align="left" min-width="130" header-align="center" label="Producto" prop="nombre" />
+          <el-table
+            v-loading="prd_list_loading"
+            bstripe
+            border
+            fit
+            highlight-current-row
+            style="width: 100%"
+            height="300"
+            fixed
+            :cell-style="{padding: '0', height: '25px'}"
+            :header-cell-style="{ background: '#96735E', color: 'white' }"
+            :data="tableData.filter(data => (!search || data.marca.toLowerCase().includes(search.toLowerCase())) && (!searchTipo || data.nombre.toLowerCase().includes(searchTipo.toLowerCase())))"
+            @click.native="mostrar($event)"
+          >
+            <el-table-column prop="nombre" header-fixed align="left" min-width="120px">
+              <template slot="header">
+                <el-input
+                  v-model="searchTipo"
+                  size="mini"
+                  placeholder="Producto"
+                  prefix-icon="el-icon-search"
+                />
+              </template>
+              <template slot-scope="{row}">
+                <small><span>{{ row.nombre }}</span></small>
+              </template>
+            </el-table-column>
             <el-table-column prop="marca">
               <template slot="header">
                 <el-input
@@ -153,6 +177,7 @@
                 />
               </template>
             </el-table-column>
+            <el-table-column align="center" label="Pres" prop="presentacion" />
             <el-table-column align="center" label="Existe" prop="existencia" />
 
             <el-table-column align="center" label="Precio">
@@ -160,9 +185,9 @@
                 <span>{{ formatDecimal(row.precio_venta) }}</span>
               </template>
             </el-table-column>
-            <el-table-column>
+            <el-table-column label="+" align="center" width="50" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button size="mini" type="success" @click="handleEdit(scope.$index, scope.row)">Agregar</el-button>
+                <el-button type="success" icon="el-icon-plus" circle @click="handleAddProduct(scope.$index, scope.row)" />
               </template>
             </el-table-column>
           </el-table>
@@ -170,8 +195,10 @@
         </div>
         
       </div>
-      <div style="width:100%;height:100%;text-align:center">
-        <el-image style="width: 250px; height: 250px" :src="url_current" :fit="fit" />
+      <div style="width:100%;height:100%;text-align:center;margin-top:20px">
+        <el-card class="box-card" style="margin-left:10px; margin-right:10px">
+          <el-image style="width: 90%; height: 50%" :src="url_current" />
+        </el-card>
       </div>
     </el-col>
   </el-row>
@@ -196,12 +223,15 @@ export default {
   },
   data() {
     return {
+      fit: 'none',
       url_current: '',
       prd_list_loading: false,
       url_s3: window.url_s3,
       url_api: window.url_api,
       tableData: [],
+      tableDataFilter: [], // Datos filtrados
       search: '',
+      searchTipo: '',
       search_prod: '',
       switch_pay: true,
       list: null,
@@ -213,73 +243,16 @@ export default {
         name_position: [{ required: true, message: 'Puesto es requerido', trigger: 'blur' }],
         desc_position: [{ required: true, message: 'Descripción es requerido', trigger: 'blur' }]
       },
-      sale_list: [
-        { product: 'Marihuana para el dolor',
-          quantity: 2,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 6,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        },
-        { product: 'Marihuana para el dolor',
-          quantity: 8,
-          price: ' 200.00',
-          subtotal: ' 400.00'
-        }
-      ]
+      sale_list: [],
+      total_sale: 0.0
+    }
+  },
+  watch: {
+    search: function(newSearch) {
+      this.filterTableData()
+    },
+    searchTipo: function(newSearchTipo) {
+      this.filterTableData()
     }
   },
   created() {
@@ -287,15 +260,19 @@ export default {
   },
   methods: {
     mostrar(event) {
-      const rowData = this.obtenerFila(event.target)
+      const rowElement = event.target.closest('.el-table__row')
+      const rowIndex = Array.from(rowElement.parentNode.children).indexOf(rowElement)
+      const rowData = this.tableDataFilter[rowIndex]
       // Lógica para mostrar los valores de todas las columnas de la fila
       console.log('Valores de la fila:', rowData.cod_producto)
       this.url_current = this.url_s3 + rowData.cod_producto + '.JPG'
     },
-    obtenerFila(target) {
-      const rowElement = target.closest('.el-table__row')
-      const rowIndex = Array.from(rowElement.parentNode.children).indexOf(rowElement)
-      return this.tableData[rowIndex]
+    filterTableData() {
+      this.tableDataFilter = this.tableData.filter(data =>
+        (!this.search || data.marca.toLowerCase().includes(this.search.toLowerCase())) &&
+        (!this.searchTipo || data.nombre.toLowerCase().includes(this.searchTipo.toLowerCase()))
+      )
+      console.log('this.tableDataFilter', this.tableDataFilter)
     },
     getProductsList() {
       this.prd_list_loading = true
@@ -303,17 +280,26 @@ export default {
         '').then((response) => {
         console.log(response.data)
         this.tableData = response.data
+        this.tableDataFilter = response.data
         this.prd_list_loading = false
       })
     },
     filterTag(value, row) {
       return row.ofer === value
     },
-    handleEdit(index, row) {
+    handleAddProduct(index, row) {
       console.log(index, row)
+      this.sale_list.push(
+        {
+          product: row.nombre,
+          quantity: 1,
+          price: row.precio_venta,
+          subtotal: row.precio_venta
+        })
+      this.calculate_total()
     },
     handleDelete(index, row) {
-      console.log(index, row)
+      console.log(index)
     },
     change_pay() {
       console.log(this.switch_pay)
@@ -324,8 +310,14 @@ export default {
     handleCancel() {
       console.log('CANCELADO')
     },
-    handleChange(value) {
-      console.log(this.sale_list)
+    handleChangeQuantity(row) {
+      row.subtotal = row.price * row.quantity
+      this.calculate_total()
+    },
+    calculate_total() {
+      const total = this.sale_list.reduce((total, obj) => total + obj.subtotal, 0)
+      console.log('total: ', this.formatDecimal(total))
+      this.total_sale = total
     },
     formatDecimal(monto) {
       var decimal = monto.toFixed(2)
