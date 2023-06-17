@@ -10,7 +10,7 @@
           border
           fit
           highlight-current-row
-          style="width: 97%;margin:10px"
+          style="width: 98%;margin-top:5px;margin-left:5px;margin-right:20px"
           height="100%"
           fixed
           :cell-style="{padding: '0', height: '25px'}"
@@ -44,11 +44,21 @@
         </el-table>
       </div>
 
-      <div id="div_detail" style=";margin-top:20px">
-        <el-row style="margin-top:20px;margin-right:10px">
+      <div id="div_detail">
+        <el-row style="margin-top:10px;margin-right:10px">
 
-          <el-col :span="10" style="text-align:center">
+          <el-col :span="12" style="text-align:center">
             <div class="grid-content bg-purple" style="margin-left:10px">
+              <el-row :gutter="10" style="width:100%;height:85px;">
+                <el-col :span="24" style="height: 100%;">
+                  <v-card style="width: 100%; height: 100%;" @click="cardClick">
+                    <!-- Contenido del card -->
+                  </v-card>
+                </el-col>
+              </el-row>
+            </div>
+
+            <div class="grid-content bg-purple" style="margin-left:10px;margin-top:10px">
               <el-row :gutter="10" style="width:100%;height:85px;">
                 <el-col :span="12" style="height: 100%;">
                   <el-popconfirm
@@ -65,47 +75,6 @@
                   </el-popconfirm>
                 </el-col>
                 <el-col :span="12" style="height: 100%;">
-                  <el-button style="width: 100%; height: 100%;">
-                    <i class="el-icon-tickets" style="font-size: 30px;" />
-                  </el-button>
-                </el-col>
-              </el-row>
-            </div>
-
-            <div class="grid-content bg-purple" style="margin-left:10px;margin-top:10px">
-              <el-row :gutter="10" style="width:100%;height:85px;">
-                <el-col :span="12" style="height: 100%;">
-                  <el-popover
-                    placement="right"
-                    width="600"
-                    trigger="click"
-                  >
-                    <el-form :label-position="labelPosition" label-width="100px" :model="formLabelAlign">
-                      <el-form-item label="Name">
-                        <el-input v-model="formLabelAlign.name" />
-                      </el-form-item>
-                      <el-form-item label="Activity zone">
-                        <el-input v-model="formLabelAlign.region" />
-                      </el-form-item>
-                      <el-form-item label="Activity form">
-                        <el-input v-model="formLabelAlign.type" />
-                      </el-form-item>
-                      <el-form-item label="Name">
-                        <el-input v-model="formLabelAlign.name" />
-                      </el-form-item>
-                      <el-form-item label="Activity zone">
-                        <el-input v-model="formLabelAlign.region" />
-                      </el-form-item>
-                      <el-form-item label="Activity form">
-                        <el-input v-model="formLabelAlign.type" />
-                      </el-form-item>
-                    </el-form>
-                    <el-button slot="reference" type="primary" style="width: 100%; height: 100%;">
-                      <i class="el-icon-user-solid" style="font-size: 30px;" />
-                    </el-button>
-                  </el-popover>
-                </el-col>
-                <el-col :span="12" style="height: 100%;">
                   <el-button type="success" style="width: 100%; height: 100%;">
                     <i class="el-icon-document-add" style="font-size: 30px;" />
                   </el-button>
@@ -114,7 +83,7 @@
             </div>
           </el-col>
 
-          <el-col :span="14" class="full-height">
+          <el-col :span="12" class="full-height">
 
             <el-card class="box-card full-height">
               <div class="card-content">
@@ -181,7 +150,7 @@
     </el-col>
 
     <el-col :span="12" class="full-height">
-      <div id="div_table_prod" class="grid-content bg-purple-light" style="height:50%;margin-right:20px">
+      <div id="div_table_prod" class="grid-content bg-purple-light" style="height:50%;margin-right:5px">
 
         <el-table
           id="table_prod"
@@ -190,10 +159,10 @@
           border
           fit
           highlight-current-row
-          style="width: 100%;margin:10px"
+          style="width: 100%;margin-top:5px;"
           height="100%"
           fixed
-          :cell-style="{padding: '0', height: '25px'}"
+          :cell-style="{padding: '0', height: '20px'}"
           :header-cell-style="{ background: '#96735E', color: 'white' }"
           :data="tableData.filter(data => (!search || data.marca.toLowerCase().includes(search.toLowerCase())) && (!searchTipo || data.nombre.toLowerCase().includes(searchTipo.toLowerCase())))"
           @click.native="mostrar($event)"
@@ -238,8 +207,8 @@
 
       </div>
 
-      <div id="div_card" style=";margin-top:20px">
-        <el-card class="box-card" style="margin:10px;height:100vh">
+      <div id="div_card" style=";margin-top:10px">
+        <el-card class="box-card" style="margin-top:5px;margin-left:2px;margin-right:5px;height:100vh">
           <div v-for="fit in fits" :key="fit">
             <el-image style="width: 99%; height: 290px" :src="url_current" :fit="fit" />
           </div>
@@ -310,6 +279,9 @@ export default {
     this.getProductsList()
   },
   methods: {
+    cardClick() {
+      console.log('cardClick')
+    },
     mostrar(event) {
       const rowElement = event.target.closest('.el-table__row')
       const rowIndex = Array.from(rowElement.parentNode.children).indexOf(rowElement)
