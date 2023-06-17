@@ -62,9 +62,11 @@
           <el-popover
             placement="left"
             width="400"
-            trigger="hover"
+            trigger="click"
           >
-            <el-image style="width: 400px; height: 400px" :src="url_s3 + row.cod_producto + '.JPG'" :fit="fit" />
+            <div v-for="fit in fits" :key="fit">
+              <el-image style="width: 380px; height: 400px" :src="url_s3 + row.cod_producto + '.JPG'" :fit="fit" />
+            </div>
             <el-button slot="reference">Imagen</el-button>
           </el-popover>
         </template>
@@ -156,6 +158,7 @@ export default {
   },
   data() {
     return {
+      fits: ['contain'],
       upl_prods:
       [
         {
@@ -210,8 +213,8 @@ export default {
           "PRMId": 0
         }
       ],
-      url_s3: window.url_s3,
-      url_api: window.url_api,
+      url_s3: localStorage.getItem('url_s3'),
+      url_api: localStorage.getItem('url_api'),
       pdfContent: null,
       file: null,
       invoiceSelected: false,

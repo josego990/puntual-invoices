@@ -6,9 +6,9 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="profilePicture" :height="'100px'" :width="'100px'" :hoverable="false">
-          <div>Hello</div>
-          {{ user.role }}
+        <pan-thumb :image="profilePicture" :height="'120px'" :width="'120px'" :hoverable="false">
+          Imagina..
+          <small><span class="pan-info-roles">lo grande que puedes ser.</span></small>
         </pan-thumb>
       </div>
       <div class="box-center">
@@ -75,14 +75,14 @@ export default {
   },
   created() {
     this.asignaDatos()
-    console.log(this.profilePicture)
+    console.log('this.profilePicture', this.profilePicture)
   },
   methods: {
     // Aquí puedes agregar tus métodos
     asignaDatos() {
-      this.profilePicture = window.profilePicture
-      this.profileEmail = window.profileEmail
-      this.profileName = window.profileName
+      this.profilePicture = localStorage.getItem('profilePicture')
+      this.profileName = localStorage.getItem('profileName')
+      this.profileEmail = localStorage.getItem('profileEmail')
     }
     // ...
   }

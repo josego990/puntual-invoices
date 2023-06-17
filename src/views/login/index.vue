@@ -159,6 +159,11 @@ export default {
       window.profileName = decodedToken.name
       window.profileEmail = decodedToken.email
 
+      // Para guardar datos en localStorage
+      localStorage.setItem('profilePicture', decodedToken.picture)
+      localStorage.setItem('profileName', decodedToken.name)
+      localStorage.setItem('profileEmail', decodedToken.email)
+
       this.logni13()
     },
     startGoogleSignIn() {
@@ -199,8 +204,10 @@ export default {
           console.log('config_data', response.data.config_data)
           // this.loginForm.username = 'admin'
           window.url_api = response.data.config_data[0].value_config
+          localStorage.setItem('url_api', response.data.config_data[0].value_config)
           // window.url_api = 'https://localhost/'
           window.url_s3 = response.data.config_data[1].value_config
+          localStorage.setItem('url_s3', response.data.config_data[1].value_config)
           // console.log('response.data.config_data[0].value_config', response.data.config_data[0].value_config)
 
           this.loading = true

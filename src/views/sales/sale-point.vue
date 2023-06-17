@@ -1,208 +1,253 @@
 <template>
-  <el-row style="background:#f0e9f4">
-    <el-col :span="12">
-      <div class="grid-content bg-purple">
-        <div>
-          <el-input class="inputBuscar" placeholder="Buscar Cliente" prefix-icon="el-icon-search" />
-          <div style="margin:10px">
+  <el-row style="background:#f0e9f4;" class="full-height">
 
-            <el-table stripe :data="sale_list" border fit highlight-current-row style="width: 100%" height="300" fixed :cell-style="{padding: '0', height: '25px'}" :header-cell-style="{ background: '#96735E', color: 'white' }">
-              <el-table-column header-fixed align="left" min-width="120px" header-align="center" label="Producto">
-                <template slot-scope="{row}">
-                  <span>{{ row.product }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column align="center" label="Cantidad" prop="quantity">
-                <template slot-scope="{row}">
-                  <el-input-number v-model="row.quantity" :max="99" :min="1" style="width: 100%" size="mini" @change="handleChangeQuantity(row)" />
-                </template>
-              </el-table-column>
-              <el-table-column align="center" label="Precio GTQ">
-                <template slot-scope="{row}">
-                  <span>{{ formatDecimal(row.price) }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column align="center" label="Subtotal GTQ">
-                <template slot-scope="{row}">
-                  <span>{{ formatDecimal(row.subtotal) }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="X" align="center" width="50" class-name="small-padding fixed-width">
-                <template slot-scope="scope">
-                  <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(scope.$index,scope.row)" />
-                </template>
-              </el-table-column>
-            </el-table>
+    <el-col :span="12" class="full-height">
 
-            <el-row style="margin-top:20px;">
-
-              <el-col :span="12" style="text-align:center;margin-top:22px">
-                <div class="grid-content bg-purple" style="width:50%;margin-left:25%">
-                  <el-row :gutter="10" style="height:85px;">
-                    <el-col :span="12" style="height: 100%;">
-                      <el-popconfirm
-                        confirm-button-text="SEGURO"
-                        cancel-button-text="No, gracias"
-                        icon="el-icon-info"
-                        icon-color="red"
-                        title="¿Está seguro de eliminar la orden?"
-                        confirm-button-type="warning"
-                      >
-                        <el-button slot="reference" type="danger" style="width: 100%;height: 100%;">ELIMINAR</el-button>
-                      </el-popconfirm>
-                    </el-col>
-                    <el-col :span="12" style="height: 100%;">
-                      <el-button type="success" style="width: 100%;height: 100%;">GUARDAR</el-button>
-                    </el-col>
-                  </el-row>
-                </div>
-                <div class="grid-content bg-purple" style="width:50%;margin-left:25%;margin-top:10px">
-                  <el-row :gutter="10" style="height:85px;">
-                    <el-col :span="12" style="height: 100%;">
-                      <el-button type="primary" style="width: 100%;height: 100%;"><small><span>VER RECIBO</span></small></el-button>
-                    </el-col>
-                    <el-col :span="12" style="height: 100%;">
-                      <el-button type="primary" style="width: 100%;height: 100%;">ORDENAR</el-button>
-                    </el-col>
-                  </el-row>
-                </div>
-              </el-col>
-
-              <el-col :span="12">
-                <div class="grid-content bg-purple-light">
-                  <el-card class="box-card">
-
-                    <el-row>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple">
-                          <span class="custom-font">SUBTOTAL     Q</span>
-                        </div>
-                      </el-col>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
-                        </div>
-                      </el-col>
-                    </el-row>
-                    <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
-                    <el-row>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple">
-                          <span class="custom-font">DESCUENTO    Q</span>
-                        </div>
-                      </el-col>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font">0.00</span>
-                        </div>
-                      </el-col>
-                    </el-row>
-                    <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
-                    <el-row style="margin-top:15px">
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple">
-                          <span class="custom-font">IMPUESTO     Q</span>
-                        </div>
-                      </el-col>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font">0.00</span>
-                        </div>
-                      </el-col>
-                    </el-row>
-                    <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
-                    <el-row style="margin-top:15px">
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple">
-                          <span class="custom-font" style="font-weight: bold;">TOTAL ORDEN  Q</span>
-                        </div>
-                      </el-col>
-                      <el-col :span="12">
-                        <div class="grid-content bg-purple-light" style="text-align:right">
-                          <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
-                        </div>
-                      </el-col>
-                    </el-row>
-
-                    <el-button style="width: 100%; margin-top: 20px" type="warning">PAGAR</el-button>
-                  </el-card>
-                </div>
-              </el-col>
-            </el-row>
-
-          </div>
-        </div>
+      <div id="div_table_sale" class="grid-content bg-purple-light" style="height:50%">
+        <el-table
+          stripe
+          :data="sale_list"
+          border
+          fit
+          highlight-current-row
+          style="width: 97%;margin:10px"
+          height="100%"
+          fixed
+          :cell-style="{padding: '0', height: '25px'}"
+          :header-cell-style="{ background: '#96735E', color: 'white' }"
+        >
+          <el-table-column header-fixed align="left" min-width="120px" header-align="center" label="Producto">
+            <template slot-scope="{row}">
+              <small><span style="font-weight:bold">{{ row.product }}</span></small>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="Cantidad" prop="quantity" width="120px">
+            <template slot-scope="{row}">
+              <el-input-number v-model="row.quantity" :max="99" :min="1" style="width: 100%" size="mini" @change="handleChangeQuantity(row)" />
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="Precio Q">
+            <template slot-scope="{row}">
+              <span>{{ formatDecimal(row.price) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="Subtotal Q">
+            <template slot-scope="{row}">
+              <span>{{ formatDecimal(row.subtotal) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="X" align="center" width="70px" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.$index,scope.row)" />
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
+
+      <div id="div_detail" style=";margin-top:20px">
+        <el-row style="margin-top:20px;margin-right:10px">
+
+          <el-col :span="10" style="text-align:center">
+            <div class="grid-content bg-purple" style="margin-left:10px">
+              <el-row :gutter="10" style="width:100%;height:85px;">
+                <el-col :span="12" style="height: 100%;">
+                  <el-popconfirm
+                    confirm-button-text="SEGURO"
+                    cancel-button-text="No, gracias"
+                    icon="el-icon-info"
+                    icon-color="red"
+                    title="¿Está seguro de eliminar la orden?"
+                    confirm-button-type="warning"
+                  >
+                    <el-button slot="reference" type="danger" style="width: 100%; height: 100%;">
+                      <i class="el-icon-delete" style="font-size: 30px;" />
+                    </el-button>
+                  </el-popconfirm>
+                </el-col>
+                <el-col :span="12" style="height: 100%;">
+                  <el-button style="width: 100%; height: 100%;">
+                    <i class="el-icon-tickets" style="font-size: 30px;" />
+                  </el-button>
+                </el-col>
+              </el-row>
+            </div>
+
+            <div class="grid-content bg-purple" style="margin-left:10px;margin-top:10px">
+              <el-row :gutter="10" style="width:100%;height:85px;">
+                <el-col :span="12" style="height: 100%;">
+                  <el-popover
+                    placement="right"
+                    width="600"
+                    trigger="click"
+                  >
+                    <el-form :label-position="labelPosition" label-width="100px" :model="formLabelAlign">
+                      <el-form-item label="Name">
+                        <el-input v-model="formLabelAlign.name" />
+                      </el-form-item>
+                      <el-form-item label="Activity zone">
+                        <el-input v-model="formLabelAlign.region" />
+                      </el-form-item>
+                      <el-form-item label="Activity form">
+                        <el-input v-model="formLabelAlign.type" />
+                      </el-form-item>
+                      <el-form-item label="Name">
+                        <el-input v-model="formLabelAlign.name" />
+                      </el-form-item>
+                      <el-form-item label="Activity zone">
+                        <el-input v-model="formLabelAlign.region" />
+                      </el-form-item>
+                      <el-form-item label="Activity form">
+                        <el-input v-model="formLabelAlign.type" />
+                      </el-form-item>
+                    </el-form>
+                    <el-button slot="reference" type="primary" style="width: 100%; height: 100%;">
+                      <i class="el-icon-user-solid" style="font-size: 30px;" />
+                    </el-button>
+                  </el-popover>
+                </el-col>
+                <el-col :span="12" style="height: 100%;">
+                  <el-button type="success" style="width: 100%; height: 100%;">
+                    <i class="el-icon-document-add" style="font-size: 30px;" />
+                  </el-button>
+                </el-col>
+              </el-row>
+            </div>
+          </el-col>
+
+          <el-col :span="14" class="full-height">
+
+            <el-card class="box-card full-height">
+              <div class="card-content">
+                <el-row>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple">
+                      <span class="custom-font">SUBTOTAL</span>
+                    </div>
+                  </el-col>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple-light" style="text-align:right">
+                      <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
+                    </div>
+                  </el-col>
+                </el-row>
+                <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
+                <el-row>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple">
+                      <span class="custom-font">DESCUENTO </span>
+                    </div>
+                  </el-col>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple-light" style="text-align:right">
+                      <span class="custom-font">0.00</span>
+                    </div>
+                  </el-col>
+                </el-row>
+                <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
+                <el-row>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple">
+                      <span class="custom-font">IMPUESTO</span>
+                    </div>
+                  </el-col>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple-light" style="text-align:right">
+                      <span class="custom-font">0.00</span>
+                    </div>
+                  </el-col>
+                </el-row>
+                <div style="height:1px;background:gray;margin-top:5px;margin-bottom:5px" />
+                <el-row>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple">
+                      <span class="custom-font" style="font-weight: bold;">TOTAL</span>
+                    </div>
+                  </el-col>
+                  <el-col :span="12">
+                    <div class="grid-content bg-purple-light" style="text-align:right">
+                      <span class="custom-font" style="font-weight: bold;">{{ formatDecimal(total_sale) }}</span>
+                    </div>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-button style="width: 100%; height: 60px; margin-top: 12px" type="warning">PAGAR</el-button>
+
+            </el-card>
+
+          </el-col>
+        </el-row>
+      </div>
+
     </el-col>
-    <el-col :span="12">
-      <div class="grid-content bg-purple-light">
-        <div>
-          <el-input v-model="search_prod" placeholder="Buscar Productos" style="margin:10px;padding-right: 20px" prefix-icon="el-icon-search" />
-        </div>
-        <div style="margin:10px">
-          <el-table
-            v-loading="prd_list_loading"
-            bstripe
-            border
-            fit
-            highlight-current-row
-            style="width: 100%"
-            height="300"
-            fixed
-            :cell-style="{padding: '0', height: '25px'}"
-            :header-cell-style="{ background: '#96735E', color: 'white' }"
-            :data="tableData.filter(data => (!search || data.marca.toLowerCase().includes(search.toLowerCase())) && (!searchTipo || data.nombre.toLowerCase().includes(searchTipo.toLowerCase())))"
-            @click.native="mostrar($event)"
-          >
-            <el-table-column prop="nombre" header-fixed align="left" min-width="120px">
-              <template slot="header">
-                <el-input
-                  v-model="searchTipo"
-                  size="mini"
-                  placeholder="Producto"
-                  prefix-icon="el-icon-search"
-                />
-              </template>
-              <template slot-scope="{row}">
-                <small><span>{{ row.nombre }}</span></small>
-              </template>
-            </el-table-column>
-            <el-table-column prop="marca">
-              <template slot="header">
-                <el-input
-                  v-model="search"
-                  size="mini"
-                  placeholder="Marca"
-                  prefix-icon="el-icon-search"
-                />
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="Pres" prop="presentacion" />
-            <el-table-column align="center" label="Existe" prop="existencia" />
 
-            <el-table-column align="center" label="Precio">
-              <template slot-scope="{row}">
-                <span>{{ formatDecimal(row.precio_venta) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="+" align="center" width="50" class-name="small-padding fixed-width">
-              <template slot-scope="scope">
-                <el-button type="success" icon="el-icon-plus" circle @click="handleAddProduct(scope.$index, scope.row)" />
-              </template>
-            </el-table-column>
-          </el-table>
+    <el-col :span="12" class="full-height">
+      <div id="div_table_prod" class="grid-content bg-purple-light" style="height:50%;margin-right:20px">
 
-        </div>
-        
+        <el-table
+          id="table_prod"
+          v-loading="prd_list_loading"
+          bstripe
+          border
+          fit
+          highlight-current-row
+          style="width: 100%;margin:10px"
+          height="100%"
+          fixed
+          :cell-style="{padding: '0', height: '25px'}"
+          :header-cell-style="{ background: '#96735E', color: 'white' }"
+          :data="tableData.filter(data => (!search || data.marca.toLowerCase().includes(search.toLowerCase())) && (!searchTipo || data.nombre.toLowerCase().includes(searchTipo.toLowerCase())))"
+          @click.native="mostrar($event)"
+        >
+          <el-table-column prop="nombre" header-fixed align="left" min-width="100px">
+            <template slot="header">
+              <el-input
+                v-model="searchTipo"
+                size="mini"
+                placeholder="Producto"
+                prefix-icon="el-icon-search"
+              />
+            </template>
+            <template slot-scope="{row}">
+              <small><span style="font-weight:bold">{{ row.nombre }}</span></small>
+            </template>
+          </el-table-column>
+          <el-table-column prop="marca">
+            <template slot="header">
+              <el-input
+                v-model="search"
+                size="mini"
+                placeholder="Marca"
+                prefix-icon="el-icon-search"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="Pres" prop="presentacion" />
+          <el-table-column align="center" label="Existe" prop="existencia" />
+
+          <el-table-column align="center" label="Precio">
+            <template slot-scope="{row}">
+              <span>{{ formatDecimal(row.precio_venta) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="+" align="center" width="70px" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <el-button type="success" icon="el-icon-plus" @click="handleAddProduct(scope.$index, scope.row)" />
+            </template>
+          </el-table-column>
+        </el-table>
+
       </div>
-      <div style="width:100%;height:100%;text-align:center;margin-top:20px">
-        <el-card class="box-card" style="margin-left:10px; margin-right:10px">
-          <el-image style="width: 90%; height: 50%" :src="url_current" />
+
+      <div id="div_card" style=";margin-top:20px">
+        <el-card class="box-card" style="margin:10px;height:100vh">
+          <div v-for="fit in fits" :key="fit">
+            <el-image style="width: 99%; height: 290px" :src="url_current" :fit="fit" />
+          </div>
         </el-card>
       </div>
     </el-col>
-  </el-row>
 
+  </el-row>
 </template>
 
 <script>
@@ -223,11 +268,17 @@ export default {
   },
   data() {
     return {
-      fit: 'none',
+      formLabelAlign: {
+        name: '',
+        region: '',
+        type: ''
+      },
+      labelPosition: 'Left',
+      fits: ['contain'],
       url_current: '',
       prd_list_loading: false,
-      url_s3: window.url_s3,
-      url_api: window.url_api,
+      url_s3: localStorage.getItem('url_s3'),
+      url_api: localStorage.getItem('url_api'),
       tableData: [],
       tableDataFilter: [], // Datos filtrados
       search: '',
@@ -330,6 +381,15 @@ export default {
 </script>
 
 <style scoped>
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.full-height {
+  height: 100vh;
+}
+
 @font-face {
   font-family: 'CustomFont';
   src: url('./font/fake_receipt.otf');
