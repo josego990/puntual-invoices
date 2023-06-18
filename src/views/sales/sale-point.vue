@@ -26,12 +26,12 @@
               <el-input-number v-model="row.quantity" :max="99" :min="1" style="width: 100%" size="mini" @change="handleChangeQuantity(row)" />
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Precio Q">
+          <el-table-column align="center" label="Precio">
             <template slot-scope="{row}">
               <span>{{ formatDecimal(row.price) }}</span>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Subtotal Q">
+          <el-table-column align="center" label="Subtotal">
             <template slot-scope="{row}">
               <span>{{ formatDecimal(row.subtotal) }}</span>
             </template>
@@ -45,15 +45,126 @@
       </div>
 
       <div id="div_detail">
-        <el-row style="margin-top:10px;margin-right:10px">
+        <el-row style="margin-top:10px;margin-right:10px;">
 
-          <el-col :span="12" style="text-align:center">
+          <el-col :span="12" class="full-height" style="text-align:center;">
             <div class="grid-content bg-purple" style="margin-left:10px">
-              <el-row :gutter="10" style="width:100%;height:85px;">
+              <el-row :gutter="10" style="width:100%;height:30vh;">
                 <el-col :span="24" style="height: 100%;">
-                  <v-card style="width: 100%; height: 100%;" @click="cardClick">
-                    <!-- Contenido del card -->
-                  </v-card>
+
+                  <v-dialog
+                    transition="dialog-bottom-transition"
+                    max-width="600"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+
+                      <v-card
+                        color="primary"
+                        v-bind="attrs"
+                        style="width: 100%; height: 100%;"
+                        v-on="on"
+                        @click="cardClick"
+                      >
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;margin-top:0px">
+                          <small><div style="text-align:left;color:bisque">Nombre Cliente</div></small>
+                        </v-card-text>
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
+                          <div style="text-align:left;color:bisque;font-size:medium">Juan José González</div>
+                        </v-card-text>
+
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
+                          <small><div style="text-align:left;color:bisque">Nit</div></small>
+                        </v-card-text>
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
+                          <div style="text-align:left;color:bisque;font-size:medium">4019981-9</div>
+                        </v-card-text>
+
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
+                          <small><div style="text-align:left;color:bisque">Dirección</div></small>
+                        </v-card-text>
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
+                          <div style="text-align:left;color:bisque;font-size:medium">Ciudad</div>
+                        </v-card-text>
+
+                      </v-card>
+                    </template>
+                    <template v-slot:default="dialog">
+                      <v-card>
+                        <v-toolbar
+                          color="primary"
+                          dark
+                        >Datos de cliente</v-toolbar>
+                        <div style="width:100%;height:100%">
+                          <v-form
+                            ref="form"
+                            v-model="valid"
+                            lazy-validation
+                            style="padding:20px"
+                          >
+                            <v-text-field
+                              v-model="name"
+                              :counter="10"
+                              :rules="nameRules"
+                              label="Name"
+                              required
+                            />
+
+                            <v-text-field
+                              v-model="email"
+                              :rules="emailRules"
+                              label="E-mail"
+                              required
+                            />
+
+                            <v-select
+                              v-model="select"
+                              :items="items"
+                              :rules="[v => !!v || 'Item is required']"
+                              label="Item"
+                              required
+                            />
+
+                            <v-checkbox
+                              v-model="checkbox"
+                              :rules="[v => !!v || 'You must agree to continue!']"
+                              label="Do you agree?"
+                              required
+                            />
+
+                            <v-btn
+                              :disabled="!valid"
+                              color="success"
+                              class="mr-4"
+                              @click="validate"
+                            >
+                              Validate
+                            </v-btn>
+
+                            <v-btn
+                              color="error"
+                              class="mr-4"
+                              @click="reset"
+                            >
+                              Reset Form
+                            </v-btn>
+
+                            <v-btn
+                              color="warning"
+                              @click="resetValidation"
+                            >
+                              Reset Validation
+                            </v-btn>
+                          </v-form>
+                        </div>
+                        <v-card-actions class="justify-end">
+                          <v-btn
+                            text
+                            @click="dialog.value = false"
+                          >Close</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </template>
+                  </v-dialog>
                 </el-col>
               </el-row>
             </div>
@@ -237,6 +348,26 @@ export default {
   },
   data() {
     return {
+      valid: true,
+      name: '',
+      nameRules: [
+        v => !!v || 'Name is required',
+        v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+      ],
+      email: '',
+      emailRules: [
+        v => !!v || 'E-mail is required',
+        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      ],
+      select: null,
+      items: [
+        'Item 1',
+        'Item 2',
+        'Item 3',
+        'Item 4'
+      ],
+      checkbox: false,
+
       formLabelAlign: {
         name: '',
         region: '',
@@ -279,6 +410,15 @@ export default {
     this.getProductsList()
   },
   methods: {
+    validate() {
+      this.$refs.form.validate()
+    },
+    reset() {
+      this.$refs.form.reset()
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation()
+    },
     cardClick() {
       console.log('cardClick')
     },

@@ -19,6 +19,9 @@ import './permission' // permission control
 import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
+import vuetify from './plugins/vuetify'
+import 'roboto-fontface/css/roboto/roboto-fontface.css'
+import '@mdi/font/css/materialdesignicons.css'
 
 // import Vuetify from 'vuetify'
 
@@ -51,5 +54,6 @@ new Vue({
   el: '#app',
   router,
   store,
+  vuetify,
   render: h => h(App)
 })

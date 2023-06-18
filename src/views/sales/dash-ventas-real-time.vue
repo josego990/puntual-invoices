@@ -29,9 +29,9 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="panel panel-red"></div>
-    <div class="panel panel-yellow"></div>
-    <div class="panel panel-green"></div>
+    <div class="panel panel-red" />
+    <div class="panel panel-yellow" />
+    <div class="panel panel-green" />
   </div>
 </template>
 <script>
