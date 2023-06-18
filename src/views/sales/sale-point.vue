@@ -5,6 +5,7 @@
 
       <div id="div_table_sale" class="grid-content bg-purple-light" style="height:50%">
         <el-table
+          ref="saleTable"
           stripe
           :data="sale_list"
           border
@@ -53,6 +54,7 @@
                 <el-col :span="24" style="height: 100%;">
 
                   <v-dialog
+                    v-model="dialog.value"
                     transition="dialog-bottom-transition"
                     max-width="600"
                   >
@@ -68,27 +70,27 @@
                         <v-card-text style="padding-left:20px;padding-bottom:0px;margin-top:0px">
                           <small><div style="text-align:left;color:bisque">Nombre Cliente</div></small>
                         </v-card-text>
-                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
-                          <div style="text-align:left;color:bisque;font-size:medium">Juan José González</div>
+                        <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px;text-align:left;">
+                          <span style="color:bisque;font-size:medium" v-text="nombre" />
                         </v-card-text>
 
                         <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
                           <small><div style="text-align:left;color:bisque">Nit</div></small>
                         </v-card-text>
                         <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
-                          <div style="text-align:left;color:bisque;font-size:medium">4019981-9</div>
+                          <div style="text-align:left;color:bisque;font-size:medium" v-text="nit" />
                         </v-card-text>
 
                         <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
                           <small><div style="text-align:left;color:bisque">Dirección</div></small>
                         </v-card-text>
                         <v-card-text style="padding-left:20px;padding-bottom:0px;padding-top:0px">
-                          <div style="text-align:left;color:bisque;font-size:medium">Ciudad</div>
+                          <div style="text-align:left;color:bisque;font-size:medium" v-text="direccion" />
                         </v-card-text>
 
                       </v-card>
                     </template>
-                    <template v-slot:default="dialog">
+                    <template>
                       <v-card>
                         <v-toolbar
                           color="primary"
@@ -102,65 +104,41 @@
                             style="padding:20px"
                           >
                             <v-text-field
-                              v-model="name"
+                              v-model="nit"
                               :counter="10"
-                              :rules="nameRules"
-                              label="Name"
+                              label="Nit"
+                              @keydown.native="soloNumeros"
+                              @blur="valNit"
+                            />
+
+                            <v-text-field
+                              v-model="nombre"
+                              label="Nombre"
+                              :rules="nombreRules"
                               required
                             />
 
                             <v-text-field
-                              v-model="email"
-                              :rules="emailRules"
-                              label="E-mail"
-                              required
-                            />
-
-                            <v-select
-                              v-model="select"
-                              :items="items"
-                              :rules="[v => !!v || 'Item is required']"
-                              label="Item"
-                              required
-                            />
-
-                            <v-checkbox
-                              v-model="checkbox"
-                              :rules="[v => !!v || 'You must agree to continue!']"
-                              label="Do you agree?"
-                              required
+                              v-model="direccion"
+                              label="Dirección"
                             />
 
                             <v-btn
                               :disabled="!valid"
                               color="success"
                               class="mr-4"
-                              @click="validate"
+                              @click="validateForm"
                             >
-                              Validate
+                              Listo
                             </v-btn>
 
-                            <v-btn
-                              color="error"
-                              class="mr-4"
-                              @click="reset"
-                            >
-                              Reset Form
-                            </v-btn>
-
-                            <v-btn
-                              color="warning"
-                              @click="resetValidation"
-                            >
-                              Reset Validation
-                            </v-btn>
                           </v-form>
                         </div>
                         <v-card-actions class="justify-end">
                           <v-btn
                             text
-                            @click="dialog.value = false"
-                          >Close</v-btn>
+                            @click="cancelForm"
+                          >Cancelar</v-btn>
                         </v-card-actions>
                       </v-card>
                     </template>
@@ -348,26 +326,22 @@ export default {
   },
   data() {
     return {
+      nitValido: false,
+      dialog: {
+        value: false
+      },
       valid: true,
-      name: '',
-      nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+      nit: 'CF',
+      nitRules: [
+        v => !!v || 'Nit',
+        v => (v && v.length <= 10) || 'Nit must be less than 10 characters'
       ],
-      email: '',
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      nombre: 'N/A',
+      nombreRules: [
+        v => !!v || 'Nombre es requerido.'
       ],
-      select: null,
-      items: [
-        'Item 1',
-        'Item 2',
-        'Item 3',
-        'Item 4'
-      ],
+      direccion: 'Ciudad',
       checkbox: false,
-
       formLabelAlign: {
         name: '',
         region: '',
@@ -410,8 +384,34 @@ export default {
     this.getProductsList()
   },
   methods: {
-    validate() {
-      this.$refs.form.validate()
+    cancelForm() {
+      this.nombre = 'N/A'
+      this.nit = 'CF'
+      this.direccion = 'Ciudad'
+      this.dialog.value = false
+    },
+    validateForm() {
+      if (this.$refs.form.validate()) {
+        if (this.nit.length > 0) {
+          console.log('NIT ingresado..')
+          this.valNit()
+          if (this.nitValido) {
+            if (this.direccion === '') {
+              this.direccion = 'Ciudad'
+            }
+            this.dialog.value = false
+          } else {
+            this.$message({
+              message: 'NIT inválido',
+              type: 'error'
+            })
+          }
+        } else {
+          console.log('ALERTAR NO CLIENTE..')
+          this.nit = 'CF'
+          this.dialog.value = false
+        }
+      }
     },
     reset() {
       this.$refs.form.reset()
@@ -420,7 +420,9 @@ export default {
       this.$refs.form.resetValidation()
     },
     cardClick() {
-      console.log('cardClick')
+      this.nombre = ''
+      this.nit = ''
+      this.direccion = ''
     },
     mostrar(event) {
       const rowElement = event.target.closest('.el-table__row')
@@ -441,9 +443,13 @@ export default {
       this.prd_list_loading = true
       axios.post(this.url_api + 'get-products',
         '').then((response) => {
-        console.log(response.data)
+        // console.log(response.data)
         this.tableData = response.data
-        this.tableDataFilter = response.data
+        for (let i = 0; i < this.tableData.length; i++) {
+          this.tableData[i].precio_venta = parseFloat(this.tableData[i].precio_venta.toFixed(2))
+        }
+        console.log(this.tableData)
+        this.tableDataFilter = this.tableData
         this.prd_list_loading = false
       })
     },
@@ -452,17 +458,30 @@ export default {
     },
     handleAddProduct(index, row) {
       console.log(index, row)
-      this.sale_list.push(
-        {
-          product: row.nombre,
-          quantity: 1,
-          price: row.precio_venta,
-          subtotal: row.precio_venta
+      const indice = this.sale_list.findIndex(item => item.cod_producto === row.cod_producto)
+      console.log('this.sale_list', this.sale_list)
+      if (indice !== -1) {
+        const sale_row = this.sale_list[indice]
+        this.$refs.saleTable.setCurrentRow(sale_row)
+        this.$message({
+          message: 'Producto ya seleccionado',
+          type: 'warning'
         })
-      this.calculate_total()
+      } else {
+        this.sale_list.push(
+          {
+            product: row.nombre,
+            quantity: 1,
+            price: row.precio_venta,
+            subtotal: row.precio_venta,
+            cod_producto: row.cod_producto
+          })
+        this.calculate_total()
+      }
     },
     handleDelete(index, row) {
-      console.log(index)
+      this.sale_list.splice(index, 1)
+      this.calculate_total()
     },
     change_pay() {
       console.log(this.switch_pay)
@@ -474,12 +493,12 @@ export default {
       console.log('CANCELADO')
     },
     handleChangeQuantity(row) {
-      row.subtotal = row.price * row.quantity
+      row.subtotal = (row.price.toFixed(2) * row.quantity.toFixed(2))
       this.calculate_total()
     },
     calculate_total() {
-      const total = this.sale_list.reduce((total, obj) => total + obj.subtotal, 0)
-      console.log('total: ', this.formatDecimal(total))
+      const total = this.sale_list.reduce((total, obj) => parseFloat(total) + obj.subtotal, 0)
+      // console.log('total: ', this.formatDecimal(total))
       this.total_sale = total
     },
     formatDecimal(monto) {
@@ -487,6 +506,31 @@ export default {
       var parts = decimal.toString().split('.')
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       return parts.join('.')
+    },
+    soloNumeros(event) {
+      const codigoTecla = event.keyCode || event.which
+      console.log('codTecle: ' + codigoTecla)
+      // Permite solo números (códigos de teclas del 0 al 9, -, k)
+      if ((codigoTecla >= 48 && codigoTecla <= 57) || (codigoTecla >= 96 && codigoTecla <= 105) || (codigoTecla === 8) || (codigoTecla === 9) || (codigoTecla === 189) || (codigoTecla === 75) || (codigoTecla === 109)) {
+        return true
+      } else {
+        event.preventDefault()
+      }
+    },
+    valNit() {
+      let nd; let add = 0
+      // eslint-disable-next-line no-cond-assign
+      if (nd = /^(\d+)\-?([\dk])$/i.exec(this.nit)) {
+        nd[2] = (nd[2].toLowerCase() === 'k') ? 10 : parseInt(nd[2])
+        for (let i = 0; i < nd[1].length; i++) {
+          add += (((i - nd[1].length) * -1) + 1) * parseInt(nd[1][i])
+        }
+        this.nitValido = ((11 - (add % 11)) % 11) === nd[2]
+        console.log('Nit: ', this.nitValido)
+      } else {
+        this.nitValido = false
+        console.log('Nit: ', this.nitValido)
+      }
     }
   }
 }
