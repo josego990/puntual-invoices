@@ -157,6 +157,7 @@
                     icon-color="red"
                     title="¿Está seguro de eliminar la orden?"
                     confirm-button-type="warning"
+                    @onConfirm="confirmDelete"
                   >
                     <el-button slot="reference" type="danger" style="width: 100%; height: 100%;">
                       <i class="el-icon-delete" style="font-size: 30px;" />
@@ -384,6 +385,15 @@ export default {
     this.getProductsList()
   },
   methods: {
+    confirmDelete() {
+      console.log('popoverConfirm')
+      const len = this.sale_list.length
+      this.sale_list.splice(0, len)
+      this.calculate_total()
+      this.nombre = 'N/A'
+      this.nit = 'CF'
+      this.direccion = 'Ciudad'
+    },
     cancelForm() {
       this.nombre = 'N/A'
       this.nit = 'CF'
@@ -411,6 +421,7 @@ export default {
           this.nit = 'CF'
           this.dialog.value = false
         }
+        this.direccion = 'Ciudad'
       }
     },
     reset() {
@@ -482,6 +493,10 @@ export default {
     handleDelete(index, row) {
       this.sale_list.splice(index, 1)
       this.calculate_total()
+      this.$message({
+        message: 'Removido del pedido',
+        type: 'success'
+      })
     },
     change_pay() {
       console.log(this.switch_pay)
