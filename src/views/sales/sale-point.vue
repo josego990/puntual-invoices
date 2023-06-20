@@ -56,7 +56,7 @@
                   <v-dialog
                     v-model="dialog.value"
                     transition="dialog-bottom-transition"
-                    max-width="600"
+                    max-width="400"
                   >
                     <template v-slot:activator="{ on, attrs }">
 
@@ -165,9 +165,80 @@
                   </el-popconfirm>
                 </el-col>
                 <el-col :span="12" style="height: 100%;">
-                  <el-button type="success" style="width: 100%; height: 100%;">
-                    <i class="el-icon-document-add" style="font-size: 30px;" />
-                  </el-button>
+                  <v-dialog
+                    v-model="dialog_pedido.value"
+                    transition="dialog-bottom-transition"
+                    scrollable
+                    max-width="500"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <el-button v-bind="attrs" type="success" style="width: 100%; height: 100%;" v-on="on" @click="generaPedido">
+                        <i class="el-icon-document-add" style="font-size: 30px;" />
+                      </el-button>
+                    </template>
+                    <template>
+                      <v-card>
+                        <v-toolbar color="success" dark style="height:30px">
+                          <span style="margin-top:-30px">Pedido</span>
+                        </v-toolbar>
+                        <v-toolbar color="success" dark>
+                          <table style="margin-top:10px;width:100%;border-collapse: collapse;">
+                            <tr>
+                              <td style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">Cliente</td>
+                              <td style="width:70%;border-bottom: 0px solid #000;padding-left:10px;">
+                                <span v-text="nombre" />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">NIT</td>
+                              <td style="width:70%;border-bottom: 0px solid #000;padding-left:10px;">
+                                <span v-text="nit" />
+                              </td>
+                            </tr>
+                          </table>
+                        </v-toolbar>
+                        <v-card-text style="padding: 0;">
+                          <el-table :data="sale_list" style="width: 100%;">
+
+                            <el-table-column align="left" label="Producto">
+                              <template slot-scope="{row}">
+                                <small><span class="custom-font" style="font-weight: bold;">{{ row.product }}</span></small>
+                              </template>
+                            </el-table-column>
+
+                            <el-table-column align="center" label="Cantidad">
+                              <template slot-scope="{row}">
+                                <span class="custom-font">{{ row.quantity }}</span>
+                              </template>
+                            </el-table-column>
+
+                            <el-table-column align="center" label="Subtotal">
+                              <template slot-scope="{row}">
+                                <span class="custom-font">{{ formatDecimal(row.subtotal) }}</span>
+                              </template>
+                            </el-table-column>
+                          </el-table>
+
+                        </v-card-text>
+                        <v-divider />
+                        <v-card-actions class="justify-end">
+                          <v-btn
+                            :disabled="!valid"
+                            color="success"
+                            class="mr-4"
+                            @click="confirmPedido"
+                          >
+                            Generar pedido
+                          </v-btn>
+
+                          <v-btn
+                            text
+                            @click="cancelDialogPedido"
+                          >Cancelar</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </template>
+                  </v-dialog>
                 </el-col>
               </el-row>
             </div>
@@ -331,6 +402,9 @@ export default {
       dialog: {
         value: false
       },
+      dialog_pedido: {
+        value: false
+      },
       valid: true,
       nit: 'CF',
       nitRules: [
@@ -385,6 +459,9 @@ export default {
     this.getProductsList()
   },
   methods: {
+    generaPedido() {
+
+    },
     confirmDelete() {
       console.log('popoverConfirm')
       const len = this.sale_list.length
@@ -399,6 +476,9 @@ export default {
       this.nit = 'CF'
       this.direccion = 'Ciudad'
       this.dialog.value = false
+    },
+    cancelDialogPedido() {
+      this.dialog_pedido.value = false
     },
     validateForm() {
       if (this.$refs.form.validate()) {
