@@ -159,7 +159,7 @@
                     confirm-button-type="warning"
                     @onConfirm="confirmDelete"
                   >
-                    <el-button slot="reference" type="danger" style="width: 100%; height: 100%;">
+                    <el-button slot="reference" :disabled="btnDeletePedidoDisabled" type="danger" style="width: 100%; height: 100%;">
                       <i class="el-icon-delete" style="font-size: 30px;" />
                     </el-button>
                   </el-popconfirm>
@@ -167,12 +167,11 @@
                 <el-col :span="12" style="height: 100%;">
                   <v-dialog
                     v-model="dialog_pedido.value"
-                    transition="dialog-bottom-transition"
                     scrollable
                     max-width="500"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <el-button v-bind="attrs" type="success" style="width: 100%; height: 100%;" v-on="on" @click="generaPedido">
+                      <el-button :disabled="btnPedidoDisabled" v-bind="attrs" type="success" style="width: 100%; height: 100%;" v-on="on">
                         <i class="el-icon-document-add" style="font-size: 30px;" />
                       </el-button>
                     </template>
@@ -181,26 +180,27 @@
                         <v-toolbar color="success" dark style="height:30px">
                           <span style="margin-top:-30px">Pedido</span>
                         </v-toolbar>
-                        <v-toolbar color="success" dark>
-                          <table style="margin-top:10px;width:100%;border-collapse: collapse;">
-                            <tr>
-                              <td style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">Cliente</td>
-                              <td style="width:70%;border-bottom: 0px solid #000;padding-left:10px;">
-                                <span v-text="nombre" />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">NIT</td>
-                              <td style="width:70%;border-bottom: 0px solid #000;padding-left:10px;">
-                                <span v-text="nit" />
-                              </td>
-                            </tr>
-                          </table>
-                        </v-toolbar>
+
+                        <table style="margin-top:10px;width:100%;border-collapse: collapse;">
+                          <tr>
+                            <td class="custom-font" style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">Cliente:</td>
+                            <td style="width:70%;border-bottom: 0px solid #000;text-align:right">
+                              <span style="padding-right:10px" class="custom-font" v-text="nombre" />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="custom-font" style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">NIT:</td>
+                            <td style="width:70%;border-bottom: 0px solid #000;text-align:right">
+                              <span style="padding-right:10px" class="custom-font" v-text="nit" />
+                            </td>
+                          </tr>
+                        </table>
+
+                        <small><span class="custom-font" style="padding-left:10px">Detalle</span></small>
                         <v-card-text style="padding: 0;">
                           <el-table :data="sale_list" style="width: 100%;">
 
-                            <el-table-column align="left" label="Producto">
+                            <el-table-column :class="custom-font" align="left" label="Producto">
                               <template slot-scope="{row}">
                                 <small><span class="custom-font" style="font-weight: bold;">{{ row.product }}</span></small>
                               </template>
@@ -218,15 +218,22 @@
                               </template>
                             </el-table-column>
                           </el-table>
-
                         </v-card-text>
+                        <table style="margin-top:10px;width:100%;border-collapse: collapse;">
+                          <tr>
+                            <td class="custom-font" style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">TOTAL:</td>
+                            <td style="width:70%;border-bottom: 0px solid #000;text-align:right">
+                              <span style="padding-right:65px" class="custom-font" v-text="formatDecimal(total_sale)" />
+                            </td>
+                          </tr>
+                        </table>
                         <v-divider />
                         <v-card-actions class="justify-end">
                           <v-btn
                             :disabled="!valid"
                             color="success"
                             class="mr-4"
-                            @click="confirmPedido"
+                            @click="generaPedido"
                           >
                             Generar pedido
                           </v-btn>
@@ -398,6 +405,8 @@ export default {
   },
   data() {
     return {
+      btnPedidoDisabled: true,
+      btnDeletePedidoDisabled: true,
       nitValido: false,
       dialog: {
         value: false
@@ -459,8 +468,17 @@ export default {
     this.getProductsList()
   },
   methods: {
+    validaListaVacia() {
+      if (this.sale_list.length > 0) {
+        this.btnPedidoDisabled = false
+        this.btnDeletePedidoDisabled = false
+      } else {
+        this.btnPedidoDisabled = true
+        this.btnDeletePedidoDisabled = true
+      }
+    },
     generaPedido() {
-
+      console.log('generaPedido..')
     },
     confirmDelete() {
       console.log('popoverConfirm')
@@ -470,6 +488,7 @@ export default {
       this.nombre = 'N/A'
       this.nit = 'CF'
       this.direccion = 'Ciudad'
+      this.validaListaVacia()
     },
     cancelForm() {
       this.nombre = 'N/A'
@@ -568,11 +587,13 @@ export default {
             cod_producto: row.cod_producto
           })
         this.calculate_total()
+        this.validaListaVacia()
       }
     },
     handleDelete(index, row) {
       this.sale_list.splice(index, 1)
       this.calculate_total()
+      this.validaListaVacia()
       this.$message({
         message: 'Removido del pedido',
         type: 'success'
