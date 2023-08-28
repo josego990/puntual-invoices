@@ -67,6 +67,9 @@
                         v-on="on"
                         @click="cardClick"
                       >
+
+                        <large><div style="text-align:left;color:bisque;padding-left:20px;padding-top:10px">Datos de Facturación</div></large>
+
                         <v-card-text style="padding-left:20px;padding-bottom:0px;margin-top:0px">
                           <small><div style="text-align:left;color:bisque">Nombre Cliente</div></small>
                         </v-card-text>
@@ -195,8 +198,8 @@
                             </td>
                           </tr>
                         </table>
-
-                        <small><span class="custom-font" style="padding-left:10px">Detalle</span></small>
+                        <v-divider />
+                        <small><span class="custom-font" style="padding-left:10px">Detalle Pedido:</span></small>
                         <v-card-text style="padding: 0;">
                           <el-table :data="sale_list" style="width: 100%;">
 
@@ -219,6 +222,7 @@
                             </el-table-column>
                           </el-table>
                         </v-card-text>
+                        <v-divider />
                         <table style="margin-top:10px;width:100%;border-collapse: collapse;">
                           <tr>
                             <td class="custom-font" style="width:30%;border-bottom: 0px solid #fff;padding-left:10px;">TOTAL:</td>
@@ -235,7 +239,7 @@
                             class="mr-4"
                             @click="generaPedido"
                           >
-                            Generar pedido
+                            GENERAR PEDIDO
                           </v-btn>
 
                           <v-btn
@@ -452,6 +456,11 @@ export default {
         name_position: [{ required: true, message: 'Puesto es requerido', trigger: 'blur' }],
         desc_position: [{ required: true, message: 'Descripción es requerido', trigger: 'blur' }]
       },
+      pedido: {
+        id_vendedor: 1,
+        id_cliente: 1,
+        sale_list: []
+      },
       sale_list: [],
       total_sale: 0.0
     }
@@ -479,6 +488,18 @@ export default {
     },
     generaPedido() {
       console.log('generaPedido..')
+      this.pedido.sale_list = this.sale_list
+      const pedidoString = JSON.stringify(this.pedido)
+
+      axios.post('http://localhost:3030/' + 'create-pedido',
+        // axios.post(this.url_api + 'create-pedido',
+        pedidoString).then((response) => {
+        console.log(response.data)
+        this.$message({
+          message: response.data,
+          type: 'success'
+        })
+      })
     },
     confirmDelete() {
       console.log('popoverConfirm')
@@ -569,7 +590,7 @@ export default {
     handleAddProduct(index, row) {
       console.log(index, row)
       const indice = this.sale_list.findIndex(item => item.cod_producto === row.cod_producto)
-      console.log('this.sale_list', this.sale_list)
+
       if (indice !== -1) {
         const sale_row = this.sale_list[indice]
         this.$refs.saleTable.setCurrentRow(sale_row)
@@ -580,12 +601,14 @@ export default {
       } else {
         this.sale_list.push(
           {
+            id_producto: row.id_producto,
             product: row.nombre,
             quantity: 1,
             price: row.precio_venta,
             subtotal: row.precio_venta,
             cod_producto: row.cod_producto
           })
+        console.log('this.sale_list', this.sale_list)
         this.calculate_total()
         this.validaListaVacia()
       }

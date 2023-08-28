@@ -324,6 +324,32 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    path: '/upload-document',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'Carga Doc',
+    alwaysShow: false, // will always show the root menu
+    meta: {
+      title: 'Carga Documentos',
+      icon: 'documentation',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'upload-document',
+        component: () => import('@/views/upload/upload-document'),
+        name: 'UploadDocument',
+        meta: { title: 'Registrar Documento', noCache: false, icon: 'el-icon-upload' }
+      },
+      {
+        path: 'documents-uploads',
+        component: () => import('@/views/invoice-employe/invoices-employes'),
+        name: 'DocumentUploads',
+        meta: { title: 'Registrados', noCache: false, icon: 'skill', roles: ['admin'] }
+      }
+    ]
+  },
 
   /** when your routing map is too long, you can split it into small modules **/
   componentsRouter,

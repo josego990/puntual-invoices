@@ -97,7 +97,7 @@ export default {
       }
     }
     return {
-      url_login: 'https://3.82.197.47:443/',
+      url_login: 'http://3.82.197.47:3030/',
       // url_login: 'https://localhost/',
       loginForm: {
         username: '',
@@ -167,7 +167,7 @@ export default {
       this.logni13()
     },
     startGoogleSignIn() {
-      console.log('entre')
+      // console.log('entre')
       const autoLoadConfig = {
         client_id: '125562401752-fr2ooeomg4o2ej6k9hv15cmllb59nq4h.apps.googleusercontent.com',
         callback: this.handleCredentialResponse
@@ -181,7 +181,7 @@ export default {
       const filter = {}
       filter.login_mail = this.login_mail
       // comentar la siguiente linea:
-      filter.login_mail = 'josego990@gmail.com'
+      // filter.login_mail = 'josego990@gmail.com'
 
       const body = JSON.stringify(filter)
       console.log(body)
@@ -201,6 +201,7 @@ export default {
 
           this.loginForm.password = '111111'
           this.loginForm.username = response.data.user_data.name_role
+
           console.log('config_data', response.data.config_data)
           // this.loginForm.username = 'admin'
           window.url_api = response.data.config_data[0].value_config
