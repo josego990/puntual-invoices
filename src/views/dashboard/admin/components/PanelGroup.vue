@@ -65,10 +65,12 @@ export default {
   },
   data() {
     return {
-      cards_info: null
+      cards_info: { employe_count: 0 }
     }
   },
   created() {
+  },
+  mounted() {
     this.getDashboardData()
   },
   methods: {
@@ -76,7 +78,7 @@ export default {
       this.$emit('handleSetLineChartData', type)
     },
     getDashboardData() {
-      axios.post('https://23.23.76.112:443/get-dashboard-data',
+      axios.post('http://localhost:3030/get-dashboard-data',
         '').then((response) => {
         console.log(response.data)
         this.cards_info = response.data
